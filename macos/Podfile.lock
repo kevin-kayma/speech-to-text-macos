@@ -3,6 +3,8 @@ PODS:
     - FlutterMacOS
   - audioplayers_darwin (0.0.1):
     - FlutterMacOS
+  - file_picker (0.0.1):
+    - FlutterMacOS
   - flutter_inappwebview_macos (0.0.1):
     - FlutterMacOS
     - OrderedSet (~> 6.0.3)
@@ -19,14 +21,14 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - purchases_flutter (8.3.1):
+  - purchases_flutter (8.5.0):
     - FlutterMacOS
-    - PurchasesHybridCommon (= 13.12.1)
-  - PurchasesHybridCommon (13.12.1):
-    - RevenueCat (= 5.12.1)
+    - PurchasesHybridCommon (= 13.18.1)
+  - PurchasesHybridCommon (13.18.1):
+    - RevenueCat (= 5.16.1)
   - record_darwin (1.0.0):
     - FlutterMacOS
-  - RevenueCat (5.12.1)
+  - RevenueCat (5.16.1)
   - rive_common (0.0.1):
     - FlutterMacOS
   - screen_retriever_macos (0.0.1):
@@ -46,6 +48,7 @@ PODS:
 DEPENDENCIES:
   - appkit_ui_element_colors (from `Flutter/ephemeral/.symlinks/plugins/appkit_ui_element_colors/macos`)
   - audioplayers_darwin (from `Flutter/ephemeral/.symlinks/plugins/audioplayers_darwin/macos`)
+  - file_picker (from `Flutter/ephemeral/.symlinks/plugins/file_picker/macos`)
   - flutter_inappwebview_macos (from `Flutter/ephemeral/.symlinks/plugins/flutter_inappwebview_macos/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
   - in_app_review (from `Flutter/ephemeral/.symlinks/plugins/in_app_review/macos`)
@@ -74,6 +77,8 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/appkit_ui_element_colors/macos
   audioplayers_darwin:
     :path: Flutter/ephemeral/.symlinks/plugins/audioplayers_darwin/macos
+  file_picker:
+    :path: Flutter/ephemeral/.symlinks/plugins/file_picker/macos
   flutter_inappwebview_macos:
     :path: Flutter/ephemeral/.symlinks/plugins/flutter_inappwebview_macos/macos
   FlutterMacOS:
@@ -108,6 +113,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   appkit_ui_element_colors: 39bb2d80be3f19b152ccf4c70d5bbe6cba43d74a
   audioplayers_darwin: dcad41de4fbd0099cb3749f7ab3b0cb8f70b810c
+  file_picker: e716a70a9fe5fd9e09ebc922d7541464289443af
   flutter_inappwebview_macos: bdf207b8f4ebd58e86ae06cd96b147de99a67c9b
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
   in_app_review: a6a031b9acd03c7d103e341aa334adf2c493fb93
@@ -116,10 +122,10 @@ SPEC CHECKSUMS:
   OrderedSet: e539b66b644ff081c73a262d24ad552a69be3a94
   package_info_plus: 12f1c5c2cfe8727ca46cbd0b26677728972d9a5b
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
-  purchases_flutter: 29a1641091649111fba98bcfcb2dce851fa2f68b
-  PurchasesHybridCommon: 6c07c9abb12b96413ee583c017957f52f5f4ceaa
+  purchases_flutter: 5e6b1b1f784dd0cb00a759f12d1057e11766ebdc
+  PurchasesHybridCommon: bcc204d982166d7fcece10eb98e2ee7c0b0ea668
   record_darwin: a0d515a0ef78c440c123ea3ac76184c9927a94d6
-  RevenueCat: c6a6faaaab1ca8903416b36a51470cca0ea6b5b5
+  RevenueCat: d38c56d5e1058f955ee7fce4ea7b18d126235e64
   rive_common: 9580b9f1f08a8c85006083078e80479edf3db26a
   screen_retriever_macos: 776e0fa5d42c6163d2bf772d22478df4b302b161
   share_plus: 1fa619de8392a4398bfaf176d441853922614e89
@@ -130,4 +136,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: c2e95c8c0fe03c5c57e438583cae4cc732296009
 
-COCOAPODS: 1.16.1
+COCOAPODS: 1.16.0

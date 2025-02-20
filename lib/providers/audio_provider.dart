@@ -3,10 +3,8 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart';
 import 'package:transcribe/apis/network.dart';
-import 'package:transcribe/components/components.dart';
 import 'package:transcribe/config/config.dart';
 import 'package:transcribe/models/models.dart';
-import 'package:transcribe/models/paragraphs.dart';
 import 'package:transcribe/models/responsemodel.dart';
 import 'package:transcribe/providers/providers.dart';
 
@@ -26,7 +24,7 @@ class AudioListNotifier extends StateNotifier<List<AudioModel>> {
   void loadAudioHistory() {
     final audioBox = Boxes.getAudio();
     final audio = audioBox.get(Keys.keyAudioID);
-    if (audio is UserAudioHistory && audio != null) {
+    if (audio is UserAudioHistory) {
       state = audio.audioList.toList();
     }
   }
@@ -126,7 +124,9 @@ class AudioListNotifier extends StateNotifier<List<AudioModel>> {
           });
         } else if (user.intAudio == 2 ||
             user.intAudio == 4 ||
-            user.intAudio == 6) {
+            user.intAudio == 6 ||
+            user.intAudio == 8 ||
+            user.intAudio == 13) {
           if (mounted) Utils.reviewDialog(context);
         }
         String filename = basename(path);

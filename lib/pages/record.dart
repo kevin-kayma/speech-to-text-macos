@@ -71,7 +71,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
           // Check and request microphone permissions
           if (await recorder.hasPermission()) {
             final exPath = await Utils.getDirectory();
-            debugPrint(exPath + 'exPath');
+            debugPrint('${exPath}exPath');
             // Start the recording
             await recorder.start(
               const RecordConfig(
@@ -82,7 +82,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
               path: exPath,
             );
 // Add a small delay to ensure the recorder has started
-            await Future.delayed(Duration(milliseconds: 200));
+            await Future.delayed(const Duration(milliseconds: 200));
 
             isRecording = await recorder.isRecording();
             isPause = true;
@@ -98,7 +98,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
           StoreConfig.showSubscription(context);
         }
       } catch (e) {
-        debugPrint('---' + e.toString() + 'error');
+        debugPrint('---${e}error');
       }
     } else {
       // ignore: use_build_context_synchronously
@@ -130,17 +130,18 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
 
     //Ask review
     if (user.intRecordAudio == 0) {
-      Utils.openReviewDialog();
-      // Future.delayed(const Duration(seconds: 2), () {
-      //   Utils.reviewDialog(context);
-      // });
+      Future.delayed(const Duration(seconds: 2), () {
+        // if (mounted) Utils.reviewDialog(context);
+        Utils.openReviewDialog();
+      });
+    } else if (user.intRecordAudio == 2 ||
+        user.intRecordAudio == 4 ||
+        user.intRecordAudio == 6 ||
+        user.intRecordAudio == 8 ||
+        user.intRecordAudio == 13) {
+      if (mounted) Utils.reviewDialog(context);
     }
 
-    if (user.intRecordAudio == 1) {
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) Utils.reviewDialog(context);
-      });
-    }
     if (responsemodel == null) {
       responsemodel = Responsemodel(
         paragraphs: Paragraphs(
@@ -212,7 +213,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
       appBar: AppBar(
         backgroundColor: AppTheme.scaffoldBackgroundColor,
         foregroundColor: AppTheme.lightFontColor,
-        title: Text(Strings.strRecordAudio),
+        title: const Text(Strings.strRecordAudio),
       ),
       body: SafeArea(
         child: Padding(
@@ -369,7 +370,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
                               ),
                             ),
                           )
-                    : SizedBox(),
+                    : const SizedBox(),
                 SizedBox(
                   width: strSpeechResult != '' || isRecording ? 12 : 0,
                 ),
@@ -425,7 +426,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
       backgroundColor: AppTheme.scaffoldBackgroundColor,
       builder: (BuildContext context) {
         return Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             mainAxisSize: MainAxisSize.min,
