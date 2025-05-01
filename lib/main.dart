@@ -63,22 +63,30 @@ Future<void> initialSetup() async {
 
   await ApiService.getInitData();
 
-  if (initAlertData.entitlementID != '' &&
-      initAlertData.entitlementID != null) {
-    entitlementID = initAlertData.entitlementID ?? entitlementID;
-  }
+  // if (initAlertData.entitlementID != '' && initAlertData.entitlementID != null) {
+  //   entitlementID = initAlertData.entitlementID ?? entitlementID;
+  // }
 
   //Subscription Store Setup
-  StoreConfig();
+  // StoreConfig();
 
-  // Set minimum window size
-  if (Platform.isMacOS) {
-    await windowManager.ensureInitialized();
-    await windowManager.setMinimumSize(const Size(850, 700));
+  await StoreConfig().initStore();
+  await windowManager.ensureInitialized();
+  WindowOptions windowOptions = const WindowOptions(
+    size: Size(850, 700),
+    center: true,
+    backgroundColor: Colors.transparent,
+    skipTaskbar: false,
+    titleBarStyle: TitleBarStyle.normal,
+    windowButtonVisibility: false,
+  );
+  await windowManager.setResizable(false);
+  await windowManager.setMaximizable(false);
 
-    // Explicitly set the initial window size right after initialization
-    await windowManager.setSize(const Size(850, 700));
-  }
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
 }
 
 registerHiveAdapters() {

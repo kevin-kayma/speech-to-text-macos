@@ -19,7 +19,6 @@ export 'package:path_provider/path_provider.dart';
 // export 'package:firebase_core/firebase_core.dart';
 // export 'package:firebase_crashlytics/firebase_crashlytics.dart';
 // export 'package:firebase_analytics/firebase_analytics.dart'; //TODO:
-export 'package:flutter_inappwebview/flutter_inappwebview.dart';
 export 'package:internet_connection_checker/internet_connection_checker.dart';
 // export 'package:google_mobile_ads/google_mobile_ads.dart';
 export 'package:introduction_screen/introduction_screen.dart';

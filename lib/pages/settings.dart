@@ -1,6 +1,5 @@
 import 'package:transcribe/components/components.dart';
 import 'package:transcribe/config/config.dart';
-import 'package:transcribe/pages/feedback.dart';
 
 class Settings extends ConsumerStatefulWidget {
   const Settings({Key? key}) : super(key: key);
@@ -52,9 +51,7 @@ class _SettingsState extends ConsumerState<Settings> {
                     icon: HugeIcons.strokeRoundedStar,
                     color: AppTheme.lightFontColor,
                   ),
-                  trailing: HugeIcon(
-                      icon: HugeIcons.strokeRoundedArrowRight01,
-                      color: AppTheme.lightFontColor),
+                  trailing: HugeIcon(icon: HugeIcons.strokeRoundedArrowRight01, color: AppTheme.lightFontColor),
                 ),
               ),
               const SizedBox(height: 15),
@@ -66,11 +63,7 @@ class _SettingsState extends ConsumerState<Settings> {
                   bool isConnection = await Utils.checkInternet();
                   if (isConnection) {
                     // ignore: use_build_context_synchronously
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const FeedbackView()),
-                    );
+                    Utils.launchWebViewInApp(strFeedbackURL);
                   } else {
                     // ignore: use_build_context_synchronously
                     Utils.noNetworkDialog(context, onRetry: (() {
@@ -80,39 +73,26 @@ class _SettingsState extends ConsumerState<Settings> {
                 },
                 child: ListTile(
                   title: Text(Strings.strFeedback),
-                  leading: HugeIcon(
-                      icon: HugeIcons.strokeRoundedPenTool01,
-                      color: AppTheme.lightFontColor),
-                  trailing: HugeIcon(
-                      icon: HugeIcons.strokeRoundedArrowRight01,
-                      color: AppTheme.lightFontColor),
+                  leading: HugeIcon(icon: HugeIcons.strokeRoundedPenTool01, color: AppTheme.lightFontColor),
+                  trailing: HugeIcon(icon: HugeIcons.strokeRoundedArrowRight01, color: AppTheme.lightFontColor),
                 ),
               ),
               const SizedBox(height: 15),
-              ClickableCard(
-                onTap: () async {
-                  Utils.sendAnalyticsEvent(Keys.strAnlSettingShareApp);
-                  try {
-                    Share.share(Strings.strShareText,
-                        sharePositionOrigin: Rect.fromLTWH(
-                            0,
-                            0,
-                            MediaQuery.of(context).size.width,
-                            MediaQuery.of(context).size.height / 2));
-                  } catch (e) {
-                    debugPrint(e.toString());
-                  }
-                },
-                child: ListTile(
-                  title: const Text(Strings.strShareApp),
-                  leading: HugeIcon(
-                      icon: HugeIcons.strokeRoundedShare01,
-                      color: AppTheme.lightFontColor),
-                  trailing: HugeIcon(
-                      icon: HugeIcons.strokeRoundedArrowRight01,
-                      color: AppTheme.lightFontColor),
-                ),
-              ),
+              // ClickableCard(
+              //   onTap: () async {
+              //     Utils.sendAnalyticsEvent(Keys.strAnlSettingShareApp);
+              //     try {
+              //       Share.share(Strings.strShareText, sharePositionOrigin: Rect.fromLTWH(0, 0, MediaQuery.of(context).size.width, MediaQuery.of(context).size.height / 2));
+              //     } catch (e) {
+              //       debugPrint(e.toString());
+              //     }
+              //   },
+              //   child: ListTile(
+              //     title: const Text(Strings.strShareApp),
+              //     leading: HugeIcon(icon: HugeIcons.strokeRoundedShare01, color: AppTheme.lightFontColor),
+              //     trailing: HugeIcon(icon: HugeIcons.strokeRoundedArrowRight01, color: AppTheme.lightFontColor),
+              //   ),
+              // ), TODO:
             ],
           ),
           const SizedBox(height: 15),
@@ -133,12 +113,8 @@ class _SettingsState extends ConsumerState<Settings> {
                 },
                 child: ListTile(
                   title: const Text(Strings.strTermsOfUse),
-                  leading: HugeIcon(
-                      icon: HugeIcons.strokeRoundedDoc01,
-                      color: AppTheme.lightFontColor),
-                  trailing: HugeIcon(
-                      icon: HugeIcons.strokeRoundedArrowRight01,
-                      color: AppTheme.lightFontColor),
+                  leading: HugeIcon(icon: HugeIcons.strokeRoundedDoc01, color: AppTheme.lightFontColor),
+                  trailing: HugeIcon(icon: HugeIcons.strokeRoundedArrowRight01, color: AppTheme.lightFontColor),
                 ),
               ),
               const SizedBox(height: 15),
@@ -157,12 +133,8 @@ class _SettingsState extends ConsumerState<Settings> {
                 },
                 child: ListTile(
                   title: const Text(Strings.strPrivacyPolicy),
-                  leading: HugeIcon(
-                      icon: HugeIcons.strokeRoundedDoc02,
-                      color: AppTheme.lightFontColor),
-                  trailing: HugeIcon(
-                      icon: HugeIcons.strokeRoundedArrowRight01,
-                      color: AppTheme.lightFontColor),
+                  leading: HugeIcon(icon: HugeIcons.strokeRoundedDoc02, color: AppTheme.lightFontColor),
+                  trailing: HugeIcon(icon: HugeIcons.strokeRoundedArrowRight01, color: AppTheme.lightFontColor),
                 ),
               ),
             ],

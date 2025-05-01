@@ -66,7 +66,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
     bool isConnection = await Utils.checkInternet();
     if (isConnection) {
       try {
-        await Utils.refreshSubscription();
+        await StoreConfig().refreshSubscription();
         if (Utils.isCanAccess(CanAccess.recordaudio)) {
           // Check and request microphone permissions
           if (await recorder.hasPermission()) {
@@ -95,7 +95,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
 
           setState(() {});
         } else {
-          StoreConfig.showSubscription(context);
+          StoreConfig.openPaywall(context);
         }
       } catch (e) {
         debugPrint('---${e}error');
@@ -120,8 +120,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
     ref.read(isVoiceRecordLoadingProvider.notifier).state = true;
 
     if (!mounted) return;
-    responsemodel =
-        await ApiService.speechToTextDG(filePath, languageCode, context);
+    responsemodel = await ApiService.speechToTextDG(filePath, languageCode, context);
     ref.read(isVoiceRecordLoadingProvider.notifier).state = false;
 
     //Add in databse
@@ -134,11 +133,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
         // if (mounted) Utils.reviewDialog(context);
         Utils.openReviewDialog();
       });
-    } else if (user.intRecordAudio == 2 ||
-        user.intRecordAudio == 4 ||
-        user.intRecordAudio == 6 ||
-        user.intRecordAudio == 8 ||
-        user.intRecordAudio == 13) {
+    } else if (user.intRecordAudio == 2 || user.intRecordAudio == 4 || user.intRecordAudio == 6 || user.intRecordAudio == 8 || user.intRecordAudio == 13) {
       if (mounted) Utils.reviewDialog(context);
     }
 
@@ -149,8 +144,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
         ),
       );
     } else {
-      strSpeechResult =
-          responsemodel?.paragraphs.transcript ?? Strings.strNoResultFound;
+      strSpeechResult = responsemodel?.paragraphs.transcript ?? Strings.strNoResultFound;
     }
 
     setState(() {});
@@ -270,9 +264,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Visibility(
-                  visible: filePath.isNotEmpty &&
-                      !isRecording &&
-                      strSpeechResult != '',
+                  visible: filePath.isNotEmpty && !isRecording && strSpeechResult != '',
                   child: Padding(
                     padding: const EdgeInsets.only(right: 12.0),
                     child: CircleAvatar(
@@ -383,8 +375,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
                         radius: Sizes.radius,
                         child: IconButton(
                           onPressed: () {
-                            Clipboard.setData(
-                                ClipboardData(text: strSpeechResult));
+                            Clipboard.setData(ClipboardData(text: strSpeechResult));
                             showToast('Copied');
                           },
                           icon: HugeIcon(
@@ -436,10 +427,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
                 children: [
                   Text(
                     'Enter Recording Title',
-                    style: TextStyle(
-                        fontSize: Sizes.mediumFont,
-                        color: AppTheme.lightFontColor,
-                        fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: Sizes.mediumFont, color: AppTheme.lightFontColor, fontWeight: FontWeight.bold),
                   ),
                   spacer(),
                   CloseButton(
@@ -456,13 +444,11 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
                 controller: textEditingController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: AppTheme.greyBackgroundColor, width: 3.0),
+                    borderSide: BorderSide(color: AppTheme.greyBackgroundColor, width: 3.0),
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: AppTheme.greyBackgroundColor, width: 3.0),
+                    borderSide: BorderSide(color: AppTheme.greyBackgroundColor, width: 3.0),
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   hintText: 'Enter Title',
@@ -472,8 +458,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
                   focusColor: AppTheme.greyBackgroundColor,
                 ),
                 style: TextStyle(
-                  color: AppTheme
-                      .lightFontColor, // Change to your desired text color
+                  color: AppTheme.lightFontColor, // Change to your desired text color
                 ),
               ),
               spacer(),
@@ -484,13 +469,11 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
                     textEditingController.text = '';
                     await saveRecording();
 
-                    showToast("Saved In History", AppTheme.primaryColor,
-                        ToastGravity.CENTER);
+                    showToast("Saved In History", AppTheme.primaryColor, ToastGravity.CENTER);
                     // ignore: use_build_context_synchronously
                     Navigator.pop(context);
                   } else {
-                    showToast('Please enter recording title', Colors.red,
-                        ToastGravity.CENTER);
+                    showToast('Please enter recording title', Colors.red, ToastGravity.CENTER);
                   }
                 },
                 child: Text(

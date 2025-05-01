@@ -89,12 +89,10 @@ class TabbarState extends State<Tabbar> {
                         child: Column(
                           children: [
                             Padding(
-                              padding:
-                                  EdgeInsets.all(!isUserSubscribed ? 12.0 : 0),
+                              padding: EdgeInsets.all(!isUserSubscribed ? 12.0 : 0),
                               child: FutureBuilder(
                                 future: subscriptionCard(context),
-                                builder: (ctx, snapshot) =>
-                                    snapshot.data ?? const SizedBox(),
+                                builder: (ctx, snapshot) => snapshot.data ?? const SizedBox(),
                               ),
                             ),
                             !isUserSubscribed
@@ -102,22 +100,21 @@ class TabbarState extends State<Tabbar> {
                                     color: AppTheme.greyFontColor,
                                   )
                                 : const SizedBox(),
-                            buildSidebarTile(
-                              icon: HugeIcons.strokeRoundedVoice,
-                              title: strAppName,
-                              onTap: () => setState(() => currentIndex = 0),
-                              selected: currentIndex == 0,
-                            ),
-                            Divider(
-                              color: AppTheme.greyFontColor,
-                            ),
+                            // buildSidebarTile(
+                            //   icon: HugeIcons.strokeRoundedVoice,
+                            //   title: strAppName,
+                            //   onTap: () => setState(() => currentIndex = 0),
+                            //   selected: currentIndex == 0,
+                            // ),
+                            // Divider(
+                            //   color: AppTheme.greyFontColor,
+                            // ),
                             buildNetworkDependentTile(
                               context: context,
                               icon: HugeIcons.strokeRoundedMagicWand02,
                               title: Strings.strRateApp,
                               onAction: () async {
-                                Utils.sendAnalyticsEvent(
-                                    Keys.strAnlSettingRateApp);
+                                Utils.sendAnalyticsEvent(Keys.strAnlSettingRateApp);
                                 bool isConnection = await Utils.checkInternet();
                                 if (isConnection) {
                                   Utils.openStoreReview();
@@ -129,37 +126,28 @@ class TabbarState extends State<Tabbar> {
                                 }
                               },
                             ),
-                            buildNetworkDependentTile(
-                              context: context,
-                              icon: HugeIcons.strokeRoundedShare05,
-                              title: Strings.strShareApp,
-                              onAction: () async {
-                                Utils.sendAnalyticsEvent(
-                                    Keys.strAnlSettingShareApp);
-                                try {
-                                  Share.share(Strings.strShareText,
-                                      sharePositionOrigin: Rect.fromLTWH(
-                                          0,
-                                          0,
-                                          MediaQuery.of(context).size.width,
-                                          MediaQuery.of(context).size.height /
-                                              2));
-                                } catch (e) {
-                                  debugPrint(e.toString());
-                                }
-                              },
-                            ),
+                            // buildNetworkDependentTile(
+                            //   context: context,
+                            //   icon: HugeIcons.strokeRoundedShare05,
+                            //   title: Strings.strShareApp,
+                            //   onAction: () async {
+                            //     Utils.sendAnalyticsEvent(Keys.strAnlSettingShareApp);
+                            //     try {
+                            //       Share.share(Strings.strShareText, sharePositionOrigin: Rect.fromLTWH(0, 0, MediaQuery.of(context).size.width, MediaQuery.of(context).size.height / 2));
+                            //     } catch (e) {
+                            //       debugPrint(e.toString());
+                            //     }
+                            //   },
+                            // ),TODO
                             buildNetworkDependentTile(
                               context: context,
                               icon: HugeIcons.strokeRoundedDocumentValidation,
                               title: Strings.strTermsOfUse,
                               onAction: () async {
-                                Utils.sendAnalyticsEvent(
-                                    Keys.strAnlSettingTerms);
+                                Utils.sendAnalyticsEvent(Keys.strAnlSettingTerms);
                                 bool isConnection = await Utils.checkInternet();
                                 if (isConnection) {
-                                  Utils.launchWebViewInApp(
-                                      strTermsAndCondition);
+                                  Utils.launchWebViewInApp(strTermsAndCondition);
                                 } else {
                                   // ignore: use_build_context_synchronously
                                   Utils.noNetworkDialog(
@@ -176,8 +164,7 @@ class TabbarState extends State<Tabbar> {
                               icon: HugeIcons.strokeRoundedSecurityCheck,
                               title: Strings.strPrivacyPolicy,
                               onAction: () async {
-                                Utils.sendAnalyticsEvent(
-                                    Keys.strAnlSettingPrivacy);
+                                Utils.sendAnalyticsEvent(Keys.strAnlSettingPrivacy);
                                 bool isConnection = await Utils.checkInternet();
                                 if (isConnection) {
                                   Utils.launchWebViewInApp(strPrivacyPolicy);
@@ -198,15 +185,11 @@ class TabbarState extends State<Tabbar> {
                     ),
                     GestureDetector(
                       onTap: () async {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const FeedbackView()));
+                        Utils.launchWebViewInApp(strFeedbackURL);
                       },
                       child: Container(
                         height: 50,
-                        decoration: BoxDecoration(
-                            color: AppTheme.primaryColor.withAlpha(100)),
+                        decoration: BoxDecoration(color: AppTheme.primaryColor.withAlpha(100)),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.center,

@@ -40,18 +40,14 @@ class Utils {
       title: Text(
         title,
         maxLines: 2,
-        style: TextStyle(
-            fontSize: Sizes.mediumFont,
-            fontWeight: FontWeight.bold,
-            color: AppTheme.lightFontColor),
+        style: TextStyle(fontSize: Sizes.mediumFont, fontWeight: FontWeight.bold, color: AppTheme.lightFontColor),
       ),
     );
   }
 
   static scrollListToEND(ScrollController controller) {
     if (controller.hasClients) {
-      controller.animateTo(controller.position.maxScrollExtent,
-          duration: const Duration(seconds: 1), curve: Curves.ease);
+      controller.animateTo(controller.position.maxScrollExtent, duration: const Duration(seconds: 1), curve: Curves.ease);
     }
   }
 
@@ -63,20 +59,7 @@ class Utils {
   }
 
   //User info methods
-  static addUser(
-      {int? intQueries,
-      int? intImages,
-      int? intAudio,
-      int? intRecordAudio,
-      int? intChatReview,
-      int? intImageReview,
-      int? intShare,
-      int? intCopy,
-      int? intImageQuantity,
-      String? strImageSize,
-      bool? isDismissImageSetting,
-      bool? isIntroLoaded,
-      String? strAlertID}) {
+  static addUser({int? intQueries, int? intImages, int? intAudio, int? intRecordAudio, int? intChatReview, int? intImageReview, int? intShare, int? intCopy, int? intImageQuantity, String? strImageSize, bool? isDismissImageSetting, bool? isIntroLoaded, String? strAlertID}) {
     final user = Boxes.getUser();
     final myuser = user.get(Keys.keyUserID);
 
@@ -108,8 +91,7 @@ class Utils {
         ..intShare = intShare ?? myuser.intShare
         ..intCopy = intCopy ?? myuser.intCopy
         ..intImageQuantity = intImageQuantity ?? myuser.intImageQuantity
-        ..isDismissImageSetting =
-            isDismissImageSetting ?? myuser.isDismissImageSetting
+        ..isDismissImageSetting = isDismissImageSetting ?? myuser.isDismissImageSetting
         ..isIntroLoaded = isIntroLoaded ?? myuser.isIntroLoaded
         ..strImageSize = strImageSize ?? myuser.strImageSize
         ..strAlertID = strAlertID ?? myuser.strAlertID;
@@ -124,22 +106,18 @@ class Utils {
   }
 
 //Refresh subscription
-  static refreshSubscription() async {
-    if (kDebugMode) {
-      // isUserSubscribed = true;
-    } else {
-      if (await Purchases.isConfigured) {
-        CustomerInfo customerInfo = await Purchases.getCustomerInfo();
-        (customerInfo.entitlements.all[entitlementID] != null &&
-                (customerInfo.entitlements.all[entitlementID]?.isActive ??
-                    false))
-            ? isUserSubscribed = true
-            : isUserSubscribed = false;
-      } else {
-        debugPrint('Not configured');
-      }
-    }
-  }
+  // static refreshSubscription() async {
+  //   if (kDebugMode) {
+  //     // isUserSubscribed = true;
+  //   } else {
+  //     if (await Purchases.isConfigured) {
+  //       CustomerInfo customerInfo = await Purchases.getCustomerInfo();
+  //       (customerInfo.entitlements.all[entitlementID] != null && (customerInfo.entitlements.all[entitlementID]?.isActive ?? false)) ? isUserSubscribed = true : isUserSubscribed = false;
+  //     } else {
+  //       debugPrint('Not configured');
+  //     }
+  //   }
+  // }
 
   static checkTrial(List<String> productIdentifiers) async {
     if (await Purchases.isConfigured) {
@@ -147,38 +125,30 @@ class Utils {
       if (offerings.current != null) {
         offerings.current?.availablePackages.forEach((element) async {
           final identifier = element.storeProduct.identifier;
-          final introEligibility =
-              await Purchases.checkTrialOrIntroductoryPriceEligibility(
+          final introEligibility = await Purchases.checkTrialOrIntroductoryPriceEligibility(
             [identifier],
           );
 
           final status = introEligibility[identifier]?.status;
           switch (status) {
             case IntroEligibilityStatus.introEligibilityStatusEligible:
-              debugPrint(IntroEligibilityStatus.introEligibilityStatusEligible
-                  .toString());
+              debugPrint(IntroEligibilityStatus.introEligibilityStatusEligible.toString());
               break;
             // showToast('introEligibilityStatusEligible');
 
             case IntroEligibilityStatus.introEligibilityStatusIneligible:
-              debugPrint(IntroEligibilityStatus.introEligibilityStatusEligible
-                  .toString());
+              debugPrint(IntroEligibilityStatus.introEligibilityStatusEligible.toString());
               break;
-            case IntroEligibilityStatus
-                  .introEligibilityStatusNoIntroOfferExists:
-              debugPrint(IntroEligibilityStatus
-                  .introEligibilityStatusNoIntroOfferExists
-                  .toString());
+            case IntroEligibilityStatus.introEligibilityStatusNoIntroOfferExists:
+              debugPrint(IntroEligibilityStatus.introEligibilityStatusNoIntroOfferExists.toString());
               break;
 
             case IntroEligibilityStatus.introEligibilityStatusUnknown:
-              debugPrint(IntroEligibilityStatus.introEligibilityStatusUnknown
-                  .toString());
+              debugPrint(IntroEligibilityStatus.introEligibilityStatusUnknown.toString());
               break;
 
             default:
-              debugPrint(IntroEligibilityStatus.introEligibilityStatusUnknown
-                  .toString());
+              debugPrint(IntroEligibilityStatus.introEligibilityStatusUnknown.toString());
               break;
           }
         });
@@ -208,8 +178,7 @@ class Utils {
         }
       case CanAccess.recordaudio:
         if (userInfo != null) {
-          if (isNotPremium &&
-              (userInfo.intRecordAudio ?? 0) >= intMaxRecordAudio) {
+          if (isNotPremium && (userInfo.intRecordAudio ?? 0) >= intMaxRecordAudio) {
             return false;
           } else {
             return true;
@@ -222,25 +191,22 @@ class Utils {
     }
   }
 
-//Review
   static openStoreReview() async {
     final InAppReview inAppReview = InAppReview.instance;
     if (await inAppReview.isAvailable()) {
-      inAppReview.openStoreListing(appStoreId: strAppStoreID);
+      inAppReview.openStoreListing(appStoreId: microsoftStoreId);
     }
   }
 
   static openReviewDialog() async {
     final InAppReview inAppReview = InAppReview.instance;
-
     Future.delayed(const Duration(seconds: 1), () async {
-      inAppReview.requestReview();
+      inAppReview.openStoreListing(microsoftStoreId: microsoftStoreId);
     });
   }
 
 //Google Analytics
-  static Future<void> sendAnalyticsEvent(String eventName,
-      [Map<String, Object>? eventValue]) async {
+  static Future<void> sendAnalyticsEvent(String eventName, [Map<String, Object>? eventValue]) async {
     if (!kDebugMode) {
       // FirebaseAnalytics analytics = FirebaseAnalytics.instance;
       // await analytics.logEvent(
@@ -283,19 +249,14 @@ class Utils {
                 Text(
                   Strings.strContactDev,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: Sizes.mediumFont,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.lightFontColor),
+                  style: TextStyle(fontSize: Sizes.mediumFont, fontWeight: FontWeight.bold, color: AppTheme.lightFontColor),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   Strings.strContactDevMsg,
                   textAlign: TextAlign.center,
                   maxLines: 6,
-                  style: TextStyle(
-                      fontSize: Sizes.mediumFont,
-                      color: AppTheme.greyFontColor),
+                  style: TextStyle(fontSize: Sizes.mediumFont, color: AppTheme.greyFontColor),
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 12),
@@ -305,11 +266,7 @@ class Utils {
                     ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const FeedbackView()),
-                        );
+                        Utils.launchWebViewInApp(strFeedbackURL);
                       },
                       child: Text(
                         Strings.strSend.toUpperCase(),
@@ -319,8 +276,7 @@ class Utils {
                     const SizedBox(width: 12),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme
-                            .greyBackgroundColor, // Set the background color here
+                        backgroundColor: AppTheme.greyBackgroundColor, // Set the background color here
                       ),
                       onPressed: () {
                         Navigator.pop(context);
@@ -363,19 +319,14 @@ class Utils {
                 Text(
                   Strings.strNoNetwork,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: Sizes.mediumFont,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.lightFontColor),
+                  style: TextStyle(fontSize: Sizes.mediumFont, fontWeight: FontWeight.bold, color: AppTheme.lightFontColor),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   Strings.strNoInternetConnectionMessage,
                   textAlign: TextAlign.center,
                   maxLines: 6,
-                  style: TextStyle(
-                      fontSize: Sizes.mediumFont,
-                      color: AppTheme.greyFontColor),
+                  style: TextStyle(fontSize: Sizes.mediumFont, color: AppTheme.greyFontColor),
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 12),
@@ -436,10 +387,7 @@ class Utils {
                     ? Text(
                         initAlertData.title ?? "",
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: Sizes.mediumFont,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.lightFontColor),
+                        style: TextStyle(fontSize: Sizes.mediumFont, fontWeight: FontWeight.bold, color: AppTheme.lightFontColor),
                       )
                     : AppBar(
                         elevation: 0,
@@ -455,8 +403,7 @@ class Utils {
                             ),
                             onPressed: () {
                               Utils.addUser(strAlertID: initAlertData.alertID);
-                              if (initAlertData.isForcefullyUpdate !=
-                                  Keys.keyTrue) {
+                              if (initAlertData.isForcefullyUpdate != Keys.keyTrue) {
                                 Navigator.pop(context);
                               }
                             },
@@ -465,9 +412,7 @@ class Utils {
                         title: Text(
                           initAlertData.title ?? "",
                           maxLines: 2,
-                          style: TextStyle(
-                              fontSize: Sizes.mediumFont,
-                              fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: Sizes.mediumFont, fontWeight: FontWeight.bold),
                         ),
                       ),
                 const SizedBox(height: 12),
@@ -475,9 +420,7 @@ class Utils {
                   initAlertData.desc ?? '',
                   textAlign: TextAlign.center,
                   maxLines: 10,
-                  style: TextStyle(
-                      fontSize: Sizes.mediumFont,
-                      color: AppTheme.greyFontColor),
+                  style: TextStyle(fontSize: Sizes.mediumFont, color: AppTheme.greyFontColor),
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 12),
@@ -486,17 +429,16 @@ class Utils {
                     Utils.addUser(strAlertID: initAlertData.alertID);
 
                     if (initAlertData.msgAction == Keys.keyAppUpdate) {
-                      if (Platform.isAndroid) {
-                        OpenStore.instance.open(
-                          androidAppBundleId:
-                              strPlayStoreID, // Android app bundle package name
-                        );
-                      } else {
-                        OpenStore.instance.open(
-                          appStoreId:
-                              strAppStoreID, // AppStore id of your app for iOS
-                        );
-                      }
+                      //TODO
+                      // if (Platform.isAndroid) {
+                      //   OpenStore.instance.open(
+                      //     androidAppBundleId: strPlayStoreID, // Android app bundle package name
+                      //   );
+                      // } else {
+                      //   OpenStore.instance.open(
+                      //     appStoreId: strAppStoreID, // AppStore id of your app for iOS
+                      //   );
+                      // }
                     }
                     if (initAlertData.isForcefullyUpdate != Keys.keyTrue) {
                       Navigator.pop(context);
@@ -548,9 +490,7 @@ class Utils {
                   Strings.strReviewSubTitle,
                   textAlign: TextAlign.center,
                   maxLines: 6,
-                  style: TextStyle(
-                      fontSize: Sizes.mediumFont,
-                      color: AppTheme.greyFontColor),
+                  style: TextStyle(fontSize: Sizes.mediumFont, color: AppTheme.greyFontColor),
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 12),
@@ -576,12 +516,7 @@ class Utils {
     return future;
   }
 
-  static showWarning(
-      {required void Function()? onYes,
-      required void Function()? onNo,
-      required String strTitle,
-      required String strSubTitle,
-      required BuildContext context}) {
+  static showWarning({required void Function()? onYes, required void Function()? onNo, required String strTitle, required String strSubTitle, required BuildContext context}) {
     showModalBottomSheet<void>(
       isDismissible: false,
       enableDrag: false,
@@ -598,19 +533,14 @@ class Utils {
                 Text(
                   strTitle,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: Sizes.mediumFont,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.lightFontColor),
+                  style: TextStyle(fontSize: Sizes.mediumFont, fontWeight: FontWeight.bold, color: AppTheme.lightFontColor),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   strSubTitle,
                   textAlign: TextAlign.center,
                   maxLines: 6,
-                  style: TextStyle(
-                      fontSize: Sizes.mediumFont,
-                      color: AppTheme.greyFontColor),
+                  style: TextStyle(fontSize: Sizes.mediumFont, color: AppTheme.greyFontColor),
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 12),
@@ -752,8 +682,7 @@ class Utils {
     }
   }
 
-  static Future<void> sendErrorToSlack(String errorMessage,
-      {String? statusCode = 'Nil'}) async {
+  static Future<void> sendErrorToSlack(String errorMessage, {String? statusCode = 'Nil'}) async {
     try {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       String version = packageInfo.version;
@@ -801,8 +730,7 @@ class Utils {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String version = packageInfo.version;
 
-    inReview = initAlertData.isUpdated == Keys.keyTrue &&
-        version == initAlertData.appVersion;
+    inReview = initAlertData.isUpdated == Keys.keyTrue && version == initAlertData.appVersion;
     debugPrint(inReview.toString());
   }
 

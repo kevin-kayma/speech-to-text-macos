@@ -11,8 +11,7 @@ import 'package:transcribe/providers/providers.dart';
 final isAudioLoadingProvider = StateProvider<bool>((ref) => false);
 final isVoiceRecordLoadingProvider = StateProvider<bool>((ref) => false);
 final strAudioFileLanguageProvider = StateProvider<String>((ref) => '');
-final audioListProvider =
-    StateNotifierProvider<AudioListNotifier, List<AudioModel>>(
+final audioListProvider = StateNotifierProvider<AudioListNotifier, List<AudioModel>>(
   (ref) => AudioListNotifier(),
 );
 
@@ -59,9 +58,9 @@ class AudioListNotifier extends StateNotifier<List<AudioModel>> {
         return;
       }
 
-      await Utils.refreshSubscription();
+      await StoreConfig().refreshSubscription();
       if (!Utils.isCanAccess(CanAccess.audio)) {
-        StoreConfig.showSubscription(context);
+        StoreConfig.openPaywall(context);
         return;
       }
 
@@ -87,7 +86,7 @@ class AudioListNotifier extends StateNotifier<List<AudioModel>> {
         double fileSizeMB = file.lengthSync() / (1024 * 1024);
 
         if (fileSizeMB >= 25 && !isUserSubscribed) {
-          StoreConfig.showSubscription(context);
+          StoreConfig.openPaywall(context);
           return;
         }
 
@@ -102,8 +101,7 @@ class AudioListNotifier extends StateNotifier<List<AudioModel>> {
 
         ref.read(isAudioLoadingProvider.notifier).state = false;
         debugPrint((responsemodel?.paragraphs.transcript == "").toString());
-        if (responsemodel?.paragraphs.transcript == "" ||
-            responsemodel == null) {
+        if (responsemodel?.paragraphs.transcript == "" || responsemodel == null) {
           Utils.errorFeedbackDialog(context);
           return;
         }
@@ -122,11 +120,7 @@ class AudioListNotifier extends StateNotifier<List<AudioModel>> {
             // if (mounted) Utils.reviewDialog(context);
             Utils.openReviewDialog();
           });
-        } else if (user.intAudio == 2 ||
-            user.intAudio == 4 ||
-            user.intAudio == 6 ||
-            user.intAudio == 8 ||
-            user.intAudio == 13) {
+        } else if (user.intAudio == 2 || user.intAudio == 4 || user.intAudio == 6 || user.intAudio == 8 || user.intAudio == 13) {
           if (mounted) Utils.reviewDialog(context);
         }
         String filename = basename(path);
