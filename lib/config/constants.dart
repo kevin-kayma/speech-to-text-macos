@@ -20,8 +20,7 @@ const String strPrivacyPolicy = 'https://sites.google.com/view/transcriberspeech
 String deepLinkKey = dotenv.env[EnvKeys.deepLinkKey] ?? '';
 
 //Initiate API
-String strInitiOSURL = 'https://firebasestorage.googleapis.com/v0/b/json-23e66.appspot.com/o/transcribe.json?alt=media';
-String strInitAndroidURL = 'https://firebasestorage.googleapis.com/v0/b/json-23e66.appspot.com/o/transcribe.json?alt=media';
+String strInitURL = 'https://firebasestorage.googleapis.com/v0/b/json-23e66.appspot.com/o/transcribe_windows.json?alt=media';
 
 //Swagger API URLs
 const String urlSwTranscriptions = "https://api.firebolt.co.in/api/Home/Transcriptions";

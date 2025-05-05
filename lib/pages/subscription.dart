@@ -20,8 +20,10 @@ class Subscription extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      backgroundColor: AppTheme.scaffoldBackgroundColor,
       child: Column(
         children: [
+          SizedBox(height: 12),
           Container(
               decoration: const BoxDecoration(
                 color: Colors.black,
@@ -34,7 +36,8 @@ class Subscription extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    strAppName,
+                    ' $strAppName Pro',
+                    style: TextStyle(color: Colors.white),
                   ),
                   InkWell(
                     onTap: () {
@@ -60,9 +63,13 @@ class Subscription extends StatelessWidget {
               child: SingleChildScrollView(
                   child: Column(
                 children: [
+                  SizedBox(
+                    height: 12,
+                  ),
                   Text(
                     'Unlock Unlimited $strAppName',
                     textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 20, color: AppTheme.lightFontColor),
                   ),
                   const SizedBox(height: 20),
                   Row(
@@ -79,6 +86,7 @@ class Subscription extends StatelessWidget {
                                 myFeatureList[index],
                                 textAlign: TextAlign.center,
                                 maxLines: 3,
+                                style: TextStyle(color: AppTheme.lightFontColor),
                               ),
                             ],
                           ),
@@ -119,6 +127,7 @@ class Subscription extends StatelessWidget {
                     child: IntrinsicHeight(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        spacing: 12,
                         children: List.generate(
                           3,
                           (index) => index == 1
@@ -138,7 +147,10 @@ class Subscription extends StatelessWidget {
                                       Utils.launchWebViewInApp(strPrivacyPolicy);
                                     }
                                   },
-                                  child: Text(index == 0 ? '  Terms of Use' : 'Privacy Policy'),
+                                  child: Text(
+                                    index == 0 ? '  Terms of Use' : 'Privacy Policy',
+                                    style: TextStyle(color: AppTheme.lightFontColor),
+                                  ),
                                 ),
                         ),
                       ),
@@ -146,8 +158,9 @@ class Subscription extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Your Microsoft account will be charged at purchase confirmation and auto-renews unless canceled. You can manage your subscription anytime via your Microsoft account.\nThe subscription is monthly or yearly and works across all Windows devices and platforms linked to your Concepts account.',
+                    'Charged at purchase, auto-renews unless canceled.\nManage anytime via your Microsoft account. Works across all linked Windows devices.',
                     textAlign: TextAlign.center,
+                    style: TextStyle(color: AppTheme.greyFontColor),
                   )
                 ],
               )),
