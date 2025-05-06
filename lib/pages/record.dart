@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:transcribe/components/components.dart';
 
 import 'package:transcribe/config/config.dart';
@@ -90,7 +91,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
 
             debugPrint('Recording started: $isRecording');
           } else {
-            showToast(Strings.strGrantAudioPermission);
+            showToastMessage(Strings.strGrantAudioPermission);
           }
 
           setState(() {});
@@ -376,7 +377,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
                         child: IconButton(
                           onPressed: () {
                             Clipboard.setData(ClipboardData(text: strSpeechResult));
-                            showToast('Copied');
+                            showToastMessage('Copied');
                           },
                           icon: HugeIcon(
                             icon: HugeIcons.strokeRoundedCopy01,
@@ -469,11 +470,15 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
                     textEditingController.text = '';
                     await saveRecording();
 
-                    showToast("Saved In History", AppTheme.primaryColor, ToastGravity.CENTER);
+                    showToastMessage(
+                      "Saved In History",
+                    );
                     // ignore: use_build_context_synchronously
                     Navigator.pop(context);
                   } else {
-                    showToast('Please enter recording title', Colors.red, ToastGravity.CENTER);
+                    showToastMessage(
+                      'Please enter recording title',
+                    );
                   }
                 },
                 child: Text(

@@ -16,7 +16,8 @@ dependencies:
   responsive_sizer: ^3.3.1
   hooks_riverpod: ^2.6.1
   http: ^1.2.2
-  fluttertoast: ^8.2.8
+  # fluttertoast: ^8.2.8
+  flutter_styled_toast: ^2.2.1
   flutter_hooks: ^0.20.5
   purchases_flutter: ^8.2.0
   hive: ^2.2.3
@@ -45,7 +46,7 @@ dependencies:
   audioplayers: ^6.1.0
   hugeicons: ^0.0.7
   selectable_autolink_text: ^2.6.0
-  intl: ^0.20.1
+  intl: ^0.19.0
   macos_ui: ^2.0.9
   window_manager: ^0.4.2
   # firebase_core: ^3.10.0
@@ -80,7 +81,7 @@ msix_config:
   publisher_display_name: Kayma Tech
   publisher: CN=6D7B6037-2660-4B30-BC26-AECC23D4D646
   identity_name: KaymaTech.Transcriber-SpeechToText
-  msix_version: 1.0.0.0
+  msix_version: 1.0.2.0
   trim_logo: false
   logo_path: assets/images/appicon.png
   capabilities: "internetClient"

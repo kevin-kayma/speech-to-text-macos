@@ -186,6 +186,7 @@ class Utils {
         } else {
           return true;
         }
+
       default:
         return true;
     }
@@ -194,7 +195,7 @@ class Utils {
   static openStoreReview() async {
     final InAppReview inAppReview = InAppReview.instance;
     if (await inAppReview.isAvailable()) {
-      inAppReview.openStoreListing(appStoreId: microsoftStoreId);
+      inAppReview.openStoreListing(microsoftStoreId: microsoftStoreId);
     }
   }
 

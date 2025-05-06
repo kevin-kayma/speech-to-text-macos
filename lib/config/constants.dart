@@ -6,6 +6,9 @@ String strFeedbackEmail = "fireboltonline@gmail.com";
 String microsoftStoreId = '9NMVZHRMBFK8';
 String strFeedbackURL = 'https://docs.google.com/forms/d/e/1FAIpQLSd8Tv76gZ17MoSfsPQ3n-XAfmAvnyYHA_t-wT3PdPFNpnH27w/viewform';
 String strPlayStoreID = '';
+
+const String strStoreURL = 'https://apps.microsoft.com/store/detail/9NMVZHRMBFK8?cid=DevShareMCLPCS';
+
 const String fontFamily = 'Karla';
 
 //Slack
@@ -96,8 +99,8 @@ class Sizes {
 
   //Font
   static double btnLabelFont = 8.sp;
-  static double extraSmallFont = 9.sp;
-  static double smallFont = 11.sp;
+  static double extraSmallFont = 11.sp;
+  static double smallFont = 12.sp;
   static double mediumFont = 13.sp;
   static double largeFont = 15.sp;
   static double extraLargeFont = 20.sp;

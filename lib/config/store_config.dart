@@ -28,6 +28,9 @@ class StoreConfig {
         return license != null && license.isActive;
       },
     );
+    if (initAlertData.showSubscription == 'false') {
+      // isUserSubscribed = true;//TODO
+    }
   }
 
   bool _isInitialized = false;

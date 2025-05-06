@@ -126,19 +126,19 @@ class TabbarState extends State<Tabbar> {
                                 }
                               },
                             ),
-                            // buildNetworkDependentTile(
-                            //   context: context,
-                            //   icon: HugeIcons.strokeRoundedShare05,
-                            //   title: Strings.strShareApp,
-                            //   onAction: () async {
-                            //     Utils.sendAnalyticsEvent(Keys.strAnlSettingShareApp);
-                            //     try {
-                            //       Share.share(Strings.strShareText, sharePositionOrigin: Rect.fromLTWH(0, 0, MediaQuery.of(context).size.width, MediaQuery.of(context).size.height / 2));
-                            //     } catch (e) {
-                            //       debugPrint(e.toString());
-                            //     }
-                            //   },
-                            // ),TODO
+                            buildNetworkDependentTile(
+                              context: context,
+                              icon: HugeIcons.strokeRoundedShare05,
+                              title: Strings.strShareApp,
+                              onAction: () async {
+                                Utils.sendAnalyticsEvent(Keys.strAnlSettingShareApp);
+                                try {
+                                  Share.share(Strings.strShareText, sharePositionOrigin: Rect.fromLTWH(0, 0, MediaQuery.of(context).size.width, MediaQuery.of(context).size.height / 2));
+                                } catch (e) {
+                                  debugPrint(e.toString());
+                                }
+                              },
+                            ),
                             buildNetworkDependentTile(
                               context: context,
                               icon: HugeIcons.strokeRoundedDocumentValidation,
@@ -203,7 +203,7 @@ class TabbarState extends State<Tabbar> {
                             Text(
                               Strings.strFeedback,
                               style: TextStyle(
-                                fontSize: Sizes.smallFont,
+                                fontSize: Sizes.mediumFont,
                                 fontWeight: FontWeight.w600,
                                 color: AppTheme.lightFontColor,
                               ),

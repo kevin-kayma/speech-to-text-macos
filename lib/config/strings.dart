@@ -45,8 +45,7 @@ class Strings {
   static const strReviewTitle = 'Help us to improve!';
   static const strReviewSubTitle = 'Thank you for choosing $strAppName! We hope it\'s been useful to you so far. We\'re constantly striving to improve our app and make it the best it can be, which is why we would love to hear your thoughts.';
 
-  // static const String strShareText =
-  //     'Transcribe Any Audio Into Text.\n\nPlaystore: $strPlaystoreLink \n\nAppstore: $strAppstoreLink';TODO
+  static const String strShareText = 'Transcribe Any Audio Into Text.\n\Store: $strStoreURL';
   static const String strSubscriptionFooterAndroid = '$strAppName requires a subscription fee for access to premium features. The fee will be charged to your Google Play account upon confirmation of purchase. Subscription fees may vary depending on the length of the subscription period selected. You may cancel your subscription at any time through your Google Play account settings.';
   static const String strSubscriptionFooteriOS = 'Payment will be charged to your Apple ID account at the confirmation of purchase. The subscription will automatically renew unless auto-renew is turned off at least 24 hours before the end of the current period.';
 
@@ -54,7 +53,7 @@ class Strings {
   static const String strChatAlertSubTitle = 'This action can\'t be undone';
   static const String strNo = 'No';
   static const String strYes = 'Yes';
-  static const String strHistoryTitle = 'Do you want to clear chat?';
+  static const String strHistoryTitle = 'Do you want to clear list?';
   static const String strGrantAudioPermission = 'Please grant record audio permission in system settings.';
   static const String strFreeTrial = 'Try For Free';
   static const String strAudioToText = 'Audio To Text';

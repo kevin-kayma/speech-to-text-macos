@@ -14,6 +14,7 @@ class InitAlertData {
   String? isLifetime;
   String? intMaxAudio;
   String? intMaxRecordAudio;
+  String? showSubscription;
 
   InitAlertData({
     this.title,
@@ -31,6 +32,7 @@ class InitAlertData {
     this.isLifetime,
     this.intMaxAudio,
     this.intMaxRecordAudio,
+    this.showSubscription,
   });
 
   InitAlertData.fromJson(Map<String, dynamic> json) {
@@ -49,6 +51,7 @@ class InitAlertData {
     isLifetime = json['isLifetime'];
     intMaxAudio = json['intMaxAudio'];
     intMaxRecordAudio = json['intMaxRecordAudio'];
+    showSubscription = json['showSubscription'];
   }
 
   Map<String, dynamic> toJson() {
@@ -68,6 +71,7 @@ class InitAlertData {
     data['isLifetime'] = isLifetime;
     data['intMaxAudio'] = intMaxAudio;
     data['intMaxRecordAudio'] = intMaxRecordAudio;
+    data['showSubscription'] = showSubscription;
     return data;
   }
 }

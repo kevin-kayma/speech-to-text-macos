@@ -18,6 +18,7 @@ class Subscription extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final testProducts = [Product(title: 'Weekly', description: 'Access All Feature', price: '39.99', inCollection: true, productKind: 'weekly', storeId: 'storeid'), Product(title: 'Weekly', description: 'Access All Feature', price: '39.99', inCollection: true, productKind: 'weekly', storeId: 'storeid')];
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       backgroundColor: AppTheme.scaffoldBackgroundColor,
@@ -97,24 +98,23 @@ class Subscription extends StatelessWidget {
                   ),
                   const SizedBox(height: 30),
                   SizedBox(
-                    height: 180,
+                    height: 150,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Expanded(
                           child: Center(
                             child: ListView.separated(
-                              padding: EdgeInsets.zero,
-                              scrollDirection: Axis.horizontal,
-                              shrinkWrap: true,
-                              itemBuilder: (BuildContext context, int index) {
-                                return buildPurchaseProductCard(products[index], index, context);
-                              },
-                              separatorBuilder: (BuildContext context, int index) {
-                                return const SizedBox(width: 30);
-                              },
-                              itemCount: products.length,
-                            ),
+                                padding: EdgeInsets.zero,
+                                scrollDirection: Axis.horizontal,
+                                shrinkWrap: true,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return buildPurchaseProductCard(products[index], index, context);
+                                },
+                                separatorBuilder: (BuildContext context, int index) {
+                                  return const SizedBox(width: 30);
+                                },
+                                itemCount: products.length),
                           ),
                         ),
                       ],
@@ -179,40 +179,44 @@ Widget buildPurchaseProductCard(Product product, int index, BuildContext context
         color: AppTheme.primaryColor,
         width: 3,
       ),
-      color: AppTheme.primaryColor.withAlpha(75),
+      color: AppTheme.primaryColor.withAlpha(40),
       borderRadius: BorderRadius.circular(10),
     ),
-    child: Column(
-      children: [
-        const SizedBox(height: 14),
-        Text(
-          product.title ?? '',
-          style: TextStyle(color: AppTheme.primaryColor),
-        ),
-        const SizedBox(height: 14),
-        Text(
-          product.price ?? '',
-        ),
-        const SizedBox(height: 14),
-        ElevatedButton(
-          child: Text(
-            'Subscribe',
-            style: TextStyle(color: AppTheme.darkFontColor, fontSize: Sizes.mediumFont, fontWeight: FontWeight.bold),
+    child: Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: Column(
+        children: [
+          const SizedBox(height: 12),
+          Text(
+            product.title ?? '',
+            style: TextStyle(color: AppTheme.primaryColor, fontSize: 18),
           ),
-          style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(AppTheme.primaryColor)),
-          onPressed: () {
-            if (product.storeId != null && product.storeId != '') {
-              WindowsIap().makePurchase(product.storeId!);
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Please try again after some time.'),
-                ),
-              );
-            }
-          },
-        )
-      ],
+          const SizedBox(height: 12),
+          Text(
+            product.price ?? '',
+            style: TextStyle(color: AppTheme.lightFontColor),
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton(
+            child: Text(
+              'Subscribe',
+              style: TextStyle(color: AppTheme.darkFontColor, fontSize: Sizes.mediumFont, fontWeight: FontWeight.bold),
+            ),
+            style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(AppTheme.primaryColor)),
+            onPressed: () {
+              if (product.storeId != null && product.storeId != '') {
+                WindowsIap().makePurchase(product.storeId!);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please try again after some time.'),
+                  ),
+                );
+              }
+            },
+          )
+        ],
+      ),
     ),
   );
 }

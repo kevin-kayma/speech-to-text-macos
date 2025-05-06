@@ -41,7 +41,7 @@ export 'package:deepgram_speech_to_text/deepgram_speech_to_text.dart';
 export 'package:hugeicons/hugeicons.dart';
 // export 'package:image_picker/image_picker.dart';
 export 'package:slack_notifier/slack_notifier.dart';
-export 'package:fluttertoast/fluttertoast.dart';
+// export 'package:fluttertoast/fluttertoast.dart';
 
 export 'dart:convert';
 export 'package:flutter/material.dart';

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
 import 'package:transcribe/config/config.dart';
 import 'package:transcribe/apis/network.dart';
@@ -113,25 +114,29 @@ class MainApp extends StatelessWidget {
       builder: (context, orientation, deviceType) {
         return ProgressHud(
           isGlobalHud: true,
-          child: MacosApp(
-            scrollBehavior: const MaterialScrollBehavior().copyWith(
-              dragDevices: {
-                PointerDeviceKind.mouse,
-                PointerDeviceKind.trackpad,
+          child: StyledToast(
+            locale: const Locale('en', 'US'),
+            child: MacosApp(
+              scrollBehavior: const MaterialScrollBehavior().copyWith(
+                dragDevices: {
+                  PointerDeviceKind.mouse,
+                  PointerDeviceKind.trackpad,
+                },
+              ),
+              title: strAppName,
+              debugShowCheckedModeBanner: false,
+
+              theme: AppTheme.darkTheme,
+              themeMode: isDarkTheme ? ThemeMode.dark : ThemeMode.light,
+              // navigatorObservers: <NavigatorObserver>[observer],//TODO
+              initialRoute: isIntroLoaded ? AppRoutes.tabbar : AppRoutes.intro,
+              routes: {
+                AppRoutes.home: (_) => const MyHomePage(),
+                AppRoutes.tabbar: (_) => const Tabbar(),
+                AppRoutes.intro: (_) => const Introduction(),
+                AppRoutes.setting: (_) => const Settings(),
               },
             ),
-            title: strAppName,
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.darkTheme,
-            themeMode: isDarkTheme ? ThemeMode.dark : ThemeMode.light,
-            // navigatorObservers: <NavigatorObserver>[observer],//TODO
-            initialRoute: isIntroLoaded ? AppRoutes.tabbar : AppRoutes.intro,
-            routes: {
-              AppRoutes.home: (_) => const MyHomePage(),
-              AppRoutes.tabbar: (_) => const Tabbar(),
-              AppRoutes.intro: (_) => const Introduction(),
-              AppRoutes.setting: (_) => const Settings(),
-            },
           ),
         );
       },

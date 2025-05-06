@@ -73,7 +73,7 @@ class _AudioDetailState extends State<AudioDetail> {
           player.DeviceFileSource source = player.DeviceFileSource(filePath);
           await globalAudioPlayer.play(source);
         } else {
-          showToast('Error while playing audio');
+          showToastMessage('Error while playing audio');
         }
 
         // Pause paragraph audio if it's playing
@@ -122,7 +122,7 @@ class _AudioDetailState extends State<AudioDetail> {
       // Get the file path for the paragraph
       final filePath = await Utils.getAudioPath(widget.audioModel.filePath);
       if (filePath == '') {
-        showToast('Error while playing paragraph');
+        showToastMessage('Error while playing paragraph');
         return;
       }
 
@@ -223,7 +223,7 @@ class _AudioDetailState extends State<AudioDetail> {
                                     Clipboard.setData(ClipboardData(
                                       text: paragraph.sentences.map((sentence) => sentence.text).join(' '),
                                     ));
-                                    showToast('Copied');
+                                    showToastMessage('Copied');
                                   },
                                 ),
                                 Padding(
@@ -351,7 +351,7 @@ class _AudioDetailState extends State<AudioDetail> {
                             Clipboard.setData(ClipboardData(
                               text: widget.audioModel.responseModel?.paragraphs.transcript ?? Strings.strNoResultFound,
                             ));
-                            showToast('Copied');
+                            showToastMessage('Copied');
                           },
                         ),
                         IconButton(
