@@ -4,6 +4,8 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'package:transcribe/config/config.dart';
 import 'package:transcribe/apis/network.dart';
@@ -19,29 +21,20 @@ import 'package:transcribe/pages/tabbar.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
-  await runZonedGuarded(() async {
-    WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
 
-    //Load Env Variables
-    await dotenv.load();
+  //Load Env Variables
+  await dotenv.load();
 
-    //Firebase setup
-    // await Firebase.initializeApp();
-
-    // if (kDebugMode) {
-    //   FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(false);
-    // } else {
-    //   FlutterError.onError =
-    //       FirebaseCrashlytics.instance.recordFlutterFatalError;
-    // } //TODO
-
-    await initialSetup();
-    runApp(const ProviderScope(child: MainApp()));
-  }, (error, stack) {
-    // if (!kDebugMode) {
-    //   FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-    // }
-  });
+  await initialSetup();
+  await SentryFlutter.init((options) {
+    options.dsn = 'https://62ca0c6879bb6059a2e07242e4feed09@o4509293088014336.ingest.de.sentry.io/4509293095026768';
+    // Adds request headers and IP for users, for more info visit:
+    // https://docs.sentry.io/platforms/dart/data-management/data-collected/
+    options.sendDefaultPii = true;
+  },
+      // Init your App.
+      appRunner: () => runApp(const ProviderScope(child: MainApp())));
 }
 
 Future<void> initialSetup() async {

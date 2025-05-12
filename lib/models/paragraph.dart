@@ -1,4 +1,5 @@
-import 'package:hive/hive.dart';
+import 'package:transcribe/config/config.dart';
+
 import 'sentence.dart'; // Import Sentence model
 
 part 'paragraph.g.dart'; // Generated Hive adapter file
@@ -27,9 +28,7 @@ class Paragraph extends HiveObject {
   // Factory constructor to create a Paragraph from JSON
   factory Paragraph.fromJson(Map<String, dynamic> json) {
     return Paragraph(
-      sentences: (json['sentences'] as List)
-          .map((sentenceJson) => Sentence.fromJson(sentenceJson))
-          .toList(),
+      sentences: (json['sentences'] as List).map((sentenceJson) => Sentence.fromJson(sentenceJson)).toList(),
       numWords: json['num_words'],
       start: json['start'].toDouble(),
       end: json['end'].toDouble(),

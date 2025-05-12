@@ -80,6 +80,7 @@ class Utils {
         ..strAlertID = strAlertID ?? '';
 
       user.put(Keys.keyUserID, userInfo);
+      userInfo.save();
     } else {
       final userInfo = User()
         ..intQueries = intQueries ?? myuser.intQueries
@@ -97,12 +98,8 @@ class Utils {
         ..strAlertID = strAlertID ?? myuser.strAlertID;
 
       user.put(Keys.keyUserID, userInfo);
+      userInfo.save();
     }
-  }
-
-  //Delete user from db
-  static deleteUser(User user) {
-    user.delete();
   }
 
 //Refresh subscription

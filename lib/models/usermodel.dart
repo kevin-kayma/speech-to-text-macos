@@ -1,4 +1,4 @@
-import 'package:hive_flutter/adapters.dart';
+import 'package:hive_ce/hive.dart'; // Use `hive.dart` from hive_ce
 
 part 'usermodel.g.dart';
 

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:transcribe/config/config.dart';
 import 'package:transcribe/config/windows_iap.dart';
@@ -19,15 +20,18 @@ class StoreConfig {
   Future<void> refreshSubscription() async {
     final licenses = await _windowsIap.getAddonLicenses();
     final products = await getAvailableProducts();
-
-    isUserSubscribed = products.any(
-      (product) {
-        final id = product.storeId;
-        if (id == null || id.isEmpty) return false;
-        final license = licenses.values.where((lc) => lc.inAppOfferToken == yearlyPlan || lc.inAppOfferToken == monthlyPlan).firstOrNull;
-        return license != null && license.isActive;
-      },
-    );
+    if (kDebugMode) {
+      isUserSubscribed = true;
+    } else {
+      isUserSubscribed = products.any(
+        (product) {
+          final id = product.storeId;
+          if (id == null || id.isEmpty) return false;
+          final license = licenses.values.where((lc) => lc.inAppOfferToken == yearlyPlan || lc.inAppOfferToken == monthlyPlan).firstOrNull;
+          return license != null && license.isActive;
+        },
+      );
+    }
     if (initAlertData.showSubscription == 'false') {
       // isUserSubscribed = true;//TODO
     }
