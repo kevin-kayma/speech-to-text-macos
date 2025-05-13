@@ -4,7 +4,8 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
-import 'package:hive_ce_flutter/hive_flutter.dart';
+
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'package:transcribe/config/config.dart';
@@ -42,7 +43,16 @@ Future<void> initialSetup() async {
   // FirebaseCrashlytics.instance.crash();
 
   //HIVE Setup
-  await Hive.initFlutter();
+
+  // Get base directory
+  final baseDir = await getApplicationDocumentsDirectory();
+
+  // 👇 Create an app-specific subdirectory
+  final appSpecificPath = Directory('${baseDir.path}/$microsoftStoreId');
+  await appSpecificPath.create(recursive: true);
+
+  // Initialize Hive with the custom path
+  Hive.init(appSpecificPath.path);
 
   // Register the type adapters
   registerHiveAdapters();

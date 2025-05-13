@@ -10,9 +10,9 @@ export 'package:responsive_sizer/responsive_sizer.dart';
 export 'package:flutter_hooks/flutter_hooks.dart';
 export 'package:transcribe/models/initalertdata.dart';
 export 'package:url_launcher/url_launcher.dart';
-export 'package:hive_ce/hive.dart';
-// export 'package:hive/hive.dart';
-// export 'package:hive_flutter/hive_flutter.dart';
+// export 'package:hive_ce/hive.dart';
+export 'package:hive/hive.dart';
+export 'package:hive_flutter/hive_flutter.dart';
 export 'package:share_plus/share_plus.dart';
 export 'package:in_app_review/in_app_review.dart';
 

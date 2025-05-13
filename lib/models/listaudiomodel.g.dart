@@ -8,12 +8,16 @@ part of 'listaudiomodel.dart';
 
 class UserAudioHistoryAdapter extends TypeAdapter<UserAudioHistory> {
   @override
-  final typeId = 1;
+  final int typeId = 1;
 
   @override
   UserAudioHistory read(BinaryReader reader) {
-    reader.readByte();
-    return UserAudioHistory();
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return UserAudioHistory()
+      ..audioList = (fields[0] as List).cast<AudioModel>();
   }
 
   @override

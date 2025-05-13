@@ -8,12 +8,28 @@ part of 'usermodel.dart';
 
 class UserAdapter extends TypeAdapter<User> {
   @override
-  final typeId = 0;
+  final int typeId = 0;
 
   @override
   User read(BinaryReader reader) {
-    reader.readByte();
-    return User();
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return User()
+      ..intQueries = fields[0] as int
+      ..intImages = fields[1] as int
+      ..intShare = fields[2] as int
+      ..intCopy = fields[3] as int
+      ..intImageQuantity = fields[4] as int
+      ..strImageSize = fields[5] as String
+      ..intChatReview = fields[6] as int?
+      ..intImageReview = fields[7] as int?
+      ..isDismissImageSetting = fields[8] as bool?
+      ..isIntroLoaded = fields[9] as bool?
+      ..intAudio = fields[10] as int?
+      ..intRecordAudio = fields[11] as int?
+      ..strAlertID = fields[12] as String?;
   }
 
   @override

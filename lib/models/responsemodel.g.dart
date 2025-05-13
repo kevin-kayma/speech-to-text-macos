@@ -8,7 +8,7 @@ part of 'responsemodel.dart';
 
 class ResponsemodelAdapter extends TypeAdapter<Responsemodel> {
   @override
-  final typeId = 3;
+  final int typeId = 3;
 
   @override
   Responsemodel read(BinaryReader reader) {

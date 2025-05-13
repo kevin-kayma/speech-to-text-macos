@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:transcribe/components/components.dart';
 import 'package:transcribe/config/config.dart';
 import 'package:transcribe/models/models.dart';

@@ -8,7 +8,7 @@ part of 'sentence.dart';
 
 class SentenceAdapter extends TypeAdapter<Sentence> {
   @override
-  final typeId = 6;
+  final int typeId = 6;
 
   @override
   Sentence read(BinaryReader reader) {
@@ -18,7 +18,7 @@ class SentenceAdapter extends TypeAdapter<Sentence> {
     };
     return Sentence(
       text: fields[0] as String,
-      confidence: (fields[1] as num).toDouble(),
+      confidence: fields[1] as double,
     );
   }
 

@@ -21,7 +21,7 @@ class StoreConfig {
     final licenses = await _windowsIap.getAddonLicenses();
     final products = await getAvailableProducts();
     if (kDebugMode) {
-      isUserSubscribed = true;
+      // isUserSubscribed = true;
     } else {
       isUserSubscribed = products.any(
         (product) {

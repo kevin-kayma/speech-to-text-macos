@@ -20,10 +20,8 @@ dependencies:
   flutter_styled_toast: ^2.2.1
   flutter_hooks: ^0.20.5
   purchases_flutter: ^8.2.0
-  # hive: ^2.2.3
-  # hive_flutter: ^1.1.0
-  hive_ce: ^2.2.3
-  hive_ce_flutter: ^2.3.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
   share_plus: ^10.1.1
   in_app_review: ^2.0.9
   bmprogresshud: ^1.0.3
@@ -58,14 +56,15 @@ dependencies:
   sentry_flutter: ^8.14.2
 
 dev_dependencies:
+  sentry_dart_plugin: ^2.4.1
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^2.0.0
   flutter_launcher_icons: ^0.14.3
   build_runner: ^2.3.3
-  hive_ce_generator: ^1.9.1
-  # hive_generator: ^2.0.0
+  # hive_ce_generator: ^1.9.1
+  hive_generator: ^2.0.0
   msix: ^3.16.8
 
 flutter_native_splash:
@@ -85,7 +84,7 @@ msix_config:
   publisher_display_name: Kayma Tech
   publisher: CN=6D7B6037-2660-4B30-BC26-AECC23D4D646
   identity_name: KaymaTech.Transcriber-SpeechToText
-  msix_version: 1.0.2.0
+  msix_version: 1.0.3.0
   trim_logo: false
   logo_path: assets/images/appicon.png
   capabilities: "internetClient"
@@ -134,3 +133,9 @@ flutter:
           weight: 200
           style: italic
 
+
+sentry:
+  upload_debug_symbols: true
+  upload_source_maps: true
+  project: transcribe-win
+  org: kaymatech

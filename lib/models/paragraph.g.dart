@@ -8,7 +8,7 @@ part of 'paragraph.dart';
 
 class ParagraphAdapter extends TypeAdapter<Paragraph> {
   @override
-  final typeId = 5;
+  final int typeId = 5;
 
   @override
   Paragraph read(BinaryReader reader) {
@@ -18,9 +18,9 @@ class ParagraphAdapter extends TypeAdapter<Paragraph> {
     };
     return Paragraph(
       sentences: (fields[0] as List).cast<Sentence>(),
-      numWords: (fields[1] as num).toInt(),
-      start: (fields[2] as num).toDouble(),
-      end: (fields[3] as num).toDouble(),
+      numWords: fields[1] as int,
+      start: fields[2] as double,
+      end: fields[3] as double,
     );
   }
 
