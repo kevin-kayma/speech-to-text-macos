@@ -1,5 +1,4 @@
-import 'package:transcribe/config/config.dart';
-
+import 'package:hive/hive.dart';
 import 'paragraph.dart'; // Import the Paragraph class
 
 part 'paragraphs.g.dart'; // Generated Hive adapter file
@@ -21,7 +20,11 @@ class Paragraphs extends HiveObject {
   factory Paragraphs.fromJson(Map<String, dynamic> json) {
     return Paragraphs(
       transcript: json['transcript'],
-      paragraphs: json['paragraphs'] != null ? (json['paragraphs'] as List).map((paraJson) => Paragraph.fromJson(paraJson)).toList() : null, // Return null if 'paragraphs' is not present in the JSON
+      paragraphs: json['paragraphs'] != null
+          ? (json['paragraphs'] as List)
+              .map((paraJson) => Paragraph.fromJson(paraJson))
+              .toList()
+          : null, // Return null if 'paragraphs' is not present in the JSON
     );
   }
 

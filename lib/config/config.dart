@@ -10,7 +10,6 @@ export 'package:responsive_sizer/responsive_sizer.dart';
 export 'package:flutter_hooks/flutter_hooks.dart';
 export 'package:transcribe/models/initalertdata.dart';
 export 'package:url_launcher/url_launcher.dart';
-// export 'package:hive_ce/hive.dart';
 export 'package:hive/hive.dart';
 export 'package:hive_flutter/hive_flutter.dart';
 export 'package:share_plus/share_plus.dart';
@@ -20,6 +19,7 @@ export 'package:path_provider/path_provider.dart';
 // export 'package:firebase_core/firebase_core.dart';
 // export 'package:firebase_crashlytics/firebase_crashlytics.dart';
 // export 'package:firebase_analytics/firebase_analytics.dart'; //TODO:
+export 'package:flutter_inappwebview/flutter_inappwebview.dart';
 export 'package:internet_connection_checker/internet_connection_checker.dart';
 // export 'package:google_mobile_ads/google_mobile_ads.dart';
 export 'package:introduction_screen/introduction_screen.dart';
@@ -42,7 +42,7 @@ export 'package:deepgram_speech_to_text/deepgram_speech_to_text.dart';
 export 'package:hugeicons/hugeicons.dart';
 // export 'package:image_picker/image_picker.dart';
 export 'package:slack_notifier/slack_notifier.dart';
-// export 'package:fluttertoast/fluttertoast.dart';
+export 'package:fluttertoast/fluttertoast.dart';
 
 export 'dart:convert';
 export 'package:flutter/material.dart';

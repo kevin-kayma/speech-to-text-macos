@@ -1,7 +1,5 @@
-// Use `hive.dart` from hive_ce
+import 'package:hive_flutter/adapters.dart';
 import 'package:transcribe/models/audiomodel.dart';
-
-import 'package:hive/hive.dart';
 
 part 'listaudiomodel.g.dart';
 

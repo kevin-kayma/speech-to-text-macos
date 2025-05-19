@@ -16,8 +16,7 @@ dependencies:
   responsive_sizer: ^3.3.1
   hooks_riverpod: ^2.6.1
   http: ^1.2.2
-  # fluttertoast: ^8.2.8
-  flutter_styled_toast: ^2.2.1
+  fluttertoast: ^8.2.8
   flutter_hooks: ^0.20.5
   purchases_flutter: ^8.2.0
   hive: ^2.2.3
@@ -27,7 +26,7 @@ dependencies:
   bmprogresshud: ^1.0.3
   flutter_native_splash: ^2.2.19
   dio: ^5.7.0
-  # flutter_inappwebview: ^6.1.5
+  flutter_inappwebview: ^6.1.5
   internet_connection_checker: ^1.0.0
   introduction_screen: ^3.1.14
   speech_to_text: ^7.0.0
@@ -40,54 +39,42 @@ dependencies:
   flutter_dotenv: ^5.2.1
   quick_actions: ^1.0.8
   slack_notifier: ^1.4.0
-  # rive: ^0.13.15
+  rive: ^0.13.15
   path: ^1.9.0
   deepgram_speech_to_text: ^2.3.2
   audioplayers: ^6.1.0
   hugeicons: ^0.0.7
   selectable_autolink_text: ^2.6.0
-  intl: ^0.19.0
+  intl: ^0.20.1
   macos_ui: ^2.0.9
   window_manager: ^0.4.2
   # firebase_core: ^3.10.0
   # firebase_crashlytics: ^4.3.0
   # firebase_analytics: ^11.4.0
-  rename: ^3.0.2
-  sentry_flutter: ^8.14.2
 
 dev_dependencies:
-  sentry_dart_plugin: ^2.4.1
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^2.0.0
-  flutter_launcher_icons: ^0.14.3
+  flutter_launcher_icons: ^0.12.0
   build_runner: ^2.3.3
-  # hive_ce_generator: ^1.9.1
   hive_generator: ^2.0.0
-  msix: ^3.16.8
 
 flutter_native_splash:
-  color: "#5545FF"
-  image: 'assets/images/appicon.png'
-  icon_background_color: "#5546FF"
-  windows: true
+  color: "#5546FF"
+  image: 'assets/images/appicon_tp.png'
+  android: true
+  ios: true
 
-flutter_launcher_icons:
-  windows:
-    generate: true
-    image_path: "assets/images/appicon.png"
-    icon_size: 48 # min:48, max:256, default: 48
-
-msix_config:
-  display_name: Transcribe Audio - Speech To Text & AI Voice Note Taker
-  publisher_display_name: Kayma Tech
-  publisher: CN=6D7B6037-2660-4B30-BC26-AECC23D4D646
-  identity_name: KaymaTech.Transcriber-SpeechToText
-  msix_version: 1.0.3.0
-  trim_logo: false
-  logo_path: assets/images/appicon.png
-  capabilities: "internetClient"
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/appicon.png"
+  remove_alpha_ios: true
+  adaptive_icon_background: "#5546FF"
+  adaptive_icon_foreground: "assets/images/appicon_tp_android.png"
+  adaptive_icon_padding: true
 
 flutter:
   uses-material-design: true
@@ -133,9 +120,3 @@ flutter:
           weight: 200
           style: italic
 
-
-sentry:
-  upload_debug_symbols: true
-  upload_source_maps: true
-  project: transcribe-win
-  org: kaymatech

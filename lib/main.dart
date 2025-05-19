@@ -3,10 +3,6 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
-
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'package:transcribe/config/config.dart';
 import 'package:transcribe/apis/network.dart';
@@ -22,20 +18,29 @@ import 'package:transcribe/pages/tabbar.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  await runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  //Load Env Variables
-  await dotenv.load();
+    //Load Env Variables
+    await dotenv.load();
 
-  await initialSetup();
-  await SentryFlutter.init((options) {
-    options.dsn = 'https://62ca0c6879bb6059a2e07242e4feed09@o4509293088014336.ingest.de.sentry.io/4509293095026768';
-    // Adds request headers and IP for users, for more info visit:
-    // https://docs.sentry.io/platforms/dart/data-management/data-collected/
-    options.sendDefaultPii = true;
-  },
-      // Init your App.
-      appRunner: () => runApp(const ProviderScope(child: MainApp())));
+    //Firebase setup
+    // await Firebase.initializeApp();
+
+    // if (kDebugMode) {
+    //   FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(false);
+    // } else {
+    //   FlutterError.onError =
+    //       FirebaseCrashlytics.instance.recordFlutterFatalError;
+    // } //TODO
+
+    await initialSetup();
+    runApp(const ProviderScope(child: MainApp()));
+  }, (error, stack) {
+    // if (!kDebugMode) {
+    //   FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    // }
+  });
 }
 
 Future<void> initialSetup() async {
@@ -43,16 +48,7 @@ Future<void> initialSetup() async {
   // FirebaseCrashlytics.instance.crash();
 
   //HIVE Setup
-
-  // Get base directory
-  final baseDir = await getApplicationDocumentsDirectory();
-
-  // 👇 Create an app-specific subdirectory
-  final appSpecificPath = Directory('${baseDir.path}/$microsoftStoreId');
-  await appSpecificPath.create(recursive: true);
-
-  // Initialize Hive with the custom path
-  Hive.init(appSpecificPath.path);
+  await Hive.initFlutter();
 
   // Register the type adapters
   registerHiveAdapters();
@@ -67,30 +63,22 @@ Future<void> initialSetup() async {
 
   await ApiService.getInitData();
 
-  // if (initAlertData.entitlementID != '' && initAlertData.entitlementID != null) {
-  //   entitlementID = initAlertData.entitlementID ?? entitlementID;
-  // }
+  if (initAlertData.entitlementID != '' &&
+      initAlertData.entitlementID != null) {
+    entitlementID = initAlertData.entitlementID ?? entitlementID;
+  }
 
   //Subscription Store Setup
-  // StoreConfig();
+  StoreConfig();
 
-  await StoreConfig().initStore();
-  await windowManager.ensureInitialized();
-  WindowOptions windowOptions = const WindowOptions(
-    size: Size(850, 700),
-    center: true,
-    backgroundColor: Colors.transparent,
-    skipTaskbar: false,
-    titleBarStyle: TitleBarStyle.normal,
-    windowButtonVisibility: false,
-  );
-  await windowManager.setResizable(false);
-  await windowManager.setMaximizable(false);
+  // Set minimum window size
+  if (Platform.isMacOS) {
+    await windowManager.ensureInitialized();
+    await windowManager.setMinimumSize(const Size(850, 700));
 
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.show();
-    await windowManager.focus();
-  });
+    // Explicitly set the initial window size right after initialization
+    await windowManager.setSize(const Size(850, 700));
+  }
 }
 
 registerHiveAdapters() {
@@ -117,29 +105,25 @@ class MainApp extends StatelessWidget {
       builder: (context, orientation, deviceType) {
         return ProgressHud(
           isGlobalHud: true,
-          child: StyledToast(
-            locale: const Locale('en', 'US'),
-            child: MacosApp(
-              scrollBehavior: const MaterialScrollBehavior().copyWith(
-                dragDevices: {
-                  PointerDeviceKind.mouse,
-                  PointerDeviceKind.trackpad,
-                },
-              ),
-              title: strAppName,
-              debugShowCheckedModeBanner: false,
-
-              theme: AppTheme.darkTheme,
-              themeMode: isDarkTheme ? ThemeMode.dark : ThemeMode.light,
-              // navigatorObservers: <NavigatorObserver>[observer],//TODO
-              initialRoute: isIntroLoaded ? AppRoutes.tabbar : AppRoutes.intro,
-              routes: {
-                AppRoutes.home: (_) => const MyHomePage(),
-                AppRoutes.tabbar: (_) => const Tabbar(),
-                AppRoutes.intro: (_) => const Introduction(),
-                AppRoutes.setting: (_) => const Settings(),
+          child: MacosApp(
+            scrollBehavior: const MaterialScrollBehavior().copyWith(
+              dragDevices: {
+                PointerDeviceKind.mouse,
+                PointerDeviceKind.trackpad,
               },
             ),
+            title: strAppName,
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.darkTheme,
+            themeMode: isDarkTheme ? ThemeMode.dark : ThemeMode.light,
+            // navigatorObservers: <NavigatorObserver>[observer],//TODO
+            initialRoute: isIntroLoaded ? AppRoutes.tabbar : AppRoutes.intro,
+            routes: {
+              AppRoutes.home: (_) => const MyHomePage(),
+              AppRoutes.tabbar: (_) => const Tabbar(),
+              AppRoutes.intro: (_) => const Introduction(),
+              AppRoutes.setting: (_) => const Settings(),
+            },
           ),
         );
       },

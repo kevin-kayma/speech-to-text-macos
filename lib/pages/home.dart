@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:transcribe/components/components.dart';
 import 'package:transcribe/config/config.dart';
 import 'package:transcribe/models/models.dart';
@@ -34,12 +33,16 @@ class _AudioListState extends ConsumerState<MyHomePage> {
         // ref.read(strCurrentVersionProvider.notifier).state = version;
         debugPrint(version);
 
-        if (initAlertData.intMaxAudio != null && initAlertData.intMaxAudio!.isNotEmpty) {
-          intMaxAudio = int.parse(initAlertData.intMaxAudio ?? '2'); // Parse to int
+        if (initAlertData.intMaxAudio != null &&
+            initAlertData.intMaxAudio!.isNotEmpty) {
+          intMaxAudio =
+              int.parse(initAlertData.intMaxAudio ?? '2'); // Parse to int
         }
 
-        if (initAlertData.intMaxRecordAudio != null && initAlertData.intMaxRecordAudio!.isNotEmpty) {
-          intMaxRecordAudio = int.parse(initAlertData.intMaxRecordAudio ?? '2'); // Parse to int
+        if (initAlertData.intMaxRecordAudio != null &&
+            initAlertData.intMaxRecordAudio!.isNotEmpty) {
+          intMaxRecordAudio =
+              int.parse(initAlertData.intMaxRecordAudio ?? '2'); // Parse to int
         }
 
         if (initAlertData.deepKey != '' && initAlertData.deepKey != null) {
@@ -47,11 +50,15 @@ class _AudioListState extends ConsumerState<MyHomePage> {
         }
 
         if (initAlertData.isAlert == Keys.keyTrue && mounted) {
-          if (initAlertData.isForcefullyUpdate == Keys.keyTrue && version != initAlertData.appVersion) {
+          if (initAlertData.isForcefullyUpdate == Keys.keyTrue &&
+              version != initAlertData.appVersion) {
             Utils.initMessageDialog(context, initAlertData: initAlertData);
-          } else if (initAlertData.msgAction == Keys.keyAppUpdate && (version != initAlertData.appVersion && (userInfo?.strAlertID != initAlertData.alertID))) {
+          } else if (initAlertData.msgAction == Keys.keyAppUpdate &&
+              (version != initAlertData.appVersion &&
+                  (userInfo?.strAlertID != initAlertData.alertID))) {
             Utils.initMessageDialog(context, initAlertData: initAlertData);
-          } else if (initAlertData.msgAction != Keys.keyAppUpdate && (userInfo?.strAlertID != initAlertData.alertID)) {
+          } else if (initAlertData.msgAction != Keys.keyAppUpdate &&
+              (userInfo?.strAlertID != initAlertData.alertID)) {
             Utils.initMessageDialog(context, initAlertData: initAlertData);
           }
         }
@@ -79,7 +86,8 @@ class _AudioListState extends ConsumerState<MyHomePage> {
                       shrinkWrap: true,
                       itemCount: listAudio.length > 2 ? 2 : listAudio.length,
                       itemBuilder: (context, index) {
-                        final reversedList = listAudio.reversed.toList(); // Reverse the list
+                        final reversedList =
+                            listAudio.reversed.toList(); // Reverse the list
                         return Padding(
                           padding: const EdgeInsets.only(top: 8.0),
                           child: audioCard(context, reversedList[index]),
@@ -93,7 +101,10 @@ class _AudioListState extends ConsumerState<MyHomePage> {
                         padding: const EdgeInsets.all(20.0),
                         child: Text(
                           Strings.strNoAudioMsg,
-                          style: TextStyle(fontSize: Sizes.mediumFont, color: AppTheme.greyFontColor, fontWeight: FontWeight.w100),
+                          style: TextStyle(
+                              fontSize: Sizes.mediumFont,
+                              color: AppTheme.greyFontColor,
+                              fontWeight: FontWeight.w100),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -109,7 +120,8 @@ class _AudioListState extends ConsumerState<MyHomePage> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const AllAudioListScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const AllAudioListScreen()),
                       );
                     },
                     child: Chip(
@@ -117,7 +129,9 @@ class _AudioListState extends ConsumerState<MyHomePage> {
                       shape: const StadiumBorder(),
                       label: Text(
                         'View All',
-                        style: TextStyle(fontSize: Sizes.mediumFont, color: AppTheme.lightFontColor),
+                        style: TextStyle(
+                            fontSize: Sizes.mediumFont,
+                            color: AppTheme.lightFontColor),
                       ),
                     ),
                   ),
@@ -151,45 +165,66 @@ class _AudioListState extends ConsumerState<MyHomePage> {
                           children: <Widget>[
                             Align(
                               alignment: Alignment.centerLeft,
-                              child: Text(Strings.strSelectLanguage, style: TextStyle(color: AppTheme.greyFontColor, fontSize: Sizes.smallFont, fontWeight: FontWeight.w500)),
+                              child: Text(Strings.strSelectLanguage,
+                                  style: TextStyle(
+                                      color: AppTheme.greyFontColor,
+                                      fontSize: Sizes.smallFont,
+                                      fontWeight: FontWeight.w500)),
                             ),
                             const SizedBox(height: 12),
                             Container(
                               decoration: const ShapeDecoration(
                                 shape: RoundedRectangleBorder(
-                                  side: BorderSide(width: 2.0, style: BorderStyle.solid),
-                                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                                  side: BorderSide(
+                                      width: 2.0, style: BorderStyle.solid),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(12.0)),
                                 ),
                               ),
                               child: DropdownButtonFormField<String>(
                                 decoration: InputDecoration(
-                                  contentPadding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 20.0, horizontal: 10.0),
                                   border: OutlineInputBorder(
-                                    borderSide: BorderSide(color: AppTheme.greyBackgroundColor, width: 3.0),
+                                    borderSide: BorderSide(
+                                        color: AppTheme.greyBackgroundColor,
+                                        width: 3.0),
                                     borderRadius: BorderRadius.circular(12.0),
                                   ),
                                   focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(color: AppTheme.greyBackgroundColor, width: 3.0),
+                                    borderSide: BorderSide(
+                                        color: AppTheme.greyBackgroundColor,
+                                        width: 3.0),
                                     borderRadius: BorderRadius.circular(12.0),
                                   ),
                                   filled: true,
                                   fillColor: AppTheme.greyBackgroundColor,
                                 ),
                                 dropdownColor: AppTheme.greyBackgroundColor,
-                                menuMaxHeight: MediaQuery.of(context).size.height / 2,
+                                menuMaxHeight:
+                                    MediaQuery.of(context).size.height / 2,
                                 value: listLanguages.entries
                                     .firstWhere(
-                                      (entry) => entry.value == ref.watch(strAudioFileLanguageProvider),
-                                      orElse: () => const MapEntry('Auto Detect', ''),
+                                      (entry) =>
+                                          entry.value ==
+                                          ref.watch(
+                                              strAudioFileLanguageProvider),
+                                      orElse: () =>
+                                          const MapEntry('Auto Detect', ''),
                                     )
                                     .key,
                                 onChanged: (String? newValue) {
                                   if (newValue != null) {
                                     // Store language code in the provider
-                                    ref.read(strAudioFileLanguageProvider.notifier).state = listLanguages[newValue] ?? '';
+                                    ref
+                                        .read(strAudioFileLanguageProvider
+                                            .notifier)
+                                        .state = listLanguages[newValue] ?? '';
                                   }
                                 },
-                                items: listLanguages.keys.map<DropdownMenuItem<String>>((String value) {
+                                items: listLanguages.keys
+                                    .map<DropdownMenuItem<String>>(
+                                        (String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
                                     child: Text(
@@ -215,7 +250,9 @@ class _AudioListState extends ConsumerState<MyHomePage> {
                                   onPressed: () {
                                     currentSource = Source.audio;
                                     Utils.sendAnalyticsEvent(Keys.sourceView);
-                                    ref.read(audioListProvider.notifier).pickAndAddAudio(ref, context);
+                                    ref
+                                        .read(audioListProvider.notifier)
+                                        .pickAndAddAudio(ref, context);
                                   },
                                   icon: HugeIcon(
                                     icon: HugeIcons.strokeRoundedFileAudio,
@@ -223,7 +260,8 @@ class _AudioListState extends ConsumerState<MyHomePage> {
                                   ),
                                   label: Text(
                                     Strings.strImportAudioFile.toUpperCase(),
-                                    style: TextStyle(color: AppTheme.darkFontColor),
+                                    style: TextStyle(
+                                        color: AppTheme.darkFontColor),
                                   ),
                                 ),
                                 ElevatedButton.icon(
@@ -236,11 +274,14 @@ class _AudioListState extends ConsumerState<MyHomePage> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => const RecordAudio(),
+                                        builder: (context) =>
+                                            const RecordAudio(),
                                       ),
                                     ).then((_) {
                                       // This will refresh the audio list when you return to the home screen
-                                      ref.read(audioListProvider.notifier).loadAudioHistory();
+                                      ref
+                                          .read(audioListProvider.notifier)
+                                          .loadAudioHistory();
                                     });
                                   },
                                   icon: FittedBox(
@@ -252,7 +293,8 @@ class _AudioListState extends ConsumerState<MyHomePage> {
                                   ),
                                   label: Text(
                                     Strings.strRecordAudio.toUpperCase(),
-                                    style: TextStyle(color: AppTheme.darkFontColor),
+                                    style: TextStyle(
+                                        color: AppTheme.darkFontColor),
                                   ),
                                 ),
                               ],

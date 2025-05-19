@@ -1,4 +1,5 @@
 export 'audiodetails.dart';
+export 'feedback.dart';
 export 'home.dart';
 export 'introduction.dart';
 export 'record.dart';

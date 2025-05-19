@@ -1,4 +1,4 @@
-import 'package:transcribe/config/config.dart';
+import 'package:hive/hive.dart';
 
 part 'sentence.g.dart'; // Generated Hive adapter file
 

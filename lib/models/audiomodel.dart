@@ -1,5 +1,4 @@
-import 'package:hive_flutter/hive_flutter.dart';
-
+import 'package:hive/hive.dart';
 import 'responsemodel.dart';
 
 part 'audiomodel.g.dart';

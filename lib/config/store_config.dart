@@ -1,122 +1,119 @@
-import 'package:flutter/foundation.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:io';
+
+import 'package:bmprogresshud/bmprogresshud.dart';
 import 'package:flutter/material.dart';
-import 'package:transcribe/config/config.dart';
-import 'package:transcribe/config/windows_iap.dart';
-import 'package:transcribe/models/product.dart';
-import 'package:transcribe/pages/pages.dart';
+import 'package:flutter/services.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:transcribe/components/error.dart';
+import 'package:transcribe/config/constants.dart';
+import 'package:transcribe/config/globals.dart';
+import 'package:transcribe/config/strings.dart';
+
+import 'package:transcribe/config/utils.dart';
+import 'package:transcribe/pages/subscription.dart';
+
+enum SubscriptionTask { login, logout, restore }
 
 class StoreConfig {
-  static final StoreConfig _instance = StoreConfig._internal();
-  late WindowsIap _windowsIap;
+  late StoreConfig storeInstance;
+  late PurchasesConfiguration configuration;
 
-  List<Product> productList = [];
-
-  StoreConfig._internal();
-
-  factory StoreConfig() {
-    return _instance;
+  StoreConfig() {
+    initPlatformState();
   }
 
-  Future<void> refreshSubscription() async {
-    final licenses = await _windowsIap.getAddonLicenses();
-    final products = await getAvailableProducts();
-    if (kDebugMode) {
-      // isUserSubscribed = true;
+  Future<void> initPlatformState() async {
+    // Enable debug logs before calling `configure`.
+    await Purchases.setLogLevel(LogLevel.debug);
+
+    //Configure Store
+    PurchasesConfiguration configuration;
+    if (Platform.isIOS || Platform.isMacOS) {
+      configuration = PurchasesConfiguration(appleApiKey)
+        ..store = Store.appStore;
     } else {
-      isUserSubscribed = products.any(
-        (product) {
-          final id = product.storeId;
-          if (id == null || id.isEmpty) return false;
-          final license = licenses.values.where((lc) => lc.inAppOfferToken == yearlyPlan || lc.inAppOfferToken == monthlyPlan).firstOrNull;
-          return license != null && license.isActive;
-        },
-      );
+      configuration = PurchasesConfiguration(googleApiKey)
+        ..store = Store.playStore;
     }
-    if (initAlertData.showSubscription == 'false') {
-      // isUserSubscribed = true;//TODO
-    }
+
+    await Purchases.configure(configuration);
+    await Purchases.collectDeviceIdentifiers();
+
+    //Set User Is Prime Or Not
+    await Utils.refreshSubscription();
   }
 
-  bool _isInitialized = false;
-
-  Future<void> initStore() async {
-    if (_isInitialized) return;
-
-    _windowsIap = WindowsIap();
-    await _windowsIap.getAddonLicenses();
-    productList = await _windowsIap.getProducts();
-    await refreshSubscription();
-    _isInitialized = true;
-  }
-
-  static Future<void> openPaywall(BuildContext context) async {
-    try {
-      final products = await StoreConfig().getAvailableProducts();
-
-      // await StoreConfig().refreshSubscription();
+  /*
+    We should check if we can magically change the weather 
+    (subscription active) and if not, display the paywall.
+  */
+  static showSubscription(BuildContext context) async {
+    Utils.sendAnalyticsEvent(Keys.strAnlSubscription);
+    bool isConnection = await Utils.checkInternet();
+    if (isConnection) {
+      await Utils.refreshSubscription();
       if (!isUserSubscribed) {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return Subscription(products: products);
-          },
-        );
+        late Offerings offerings;
+        try {
+          offerings = await Purchases.getOfferings();
+
+          if (offerings.current != null) {
+            // current offering is available, show paywall
+            // ignore: use_build_context_synchronously
+            showModalBottomSheet(
+              useRootNavigator: true,
+              isDismissible: true,
+              isScrollControlled: true,
+              enableDrag: true,
+              useSafeArea: true,
+              context: context,
+              builder: (BuildContext context) {
+                return StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setModalState) {
+                  return Subscription(
+                    offering: offerings.current!,
+                  );
+                });
+              },
+            );
+          } else {
+            showToast(Strings.strTryAgainLater);
+            // offerings are empty, show a message to your user
+          }
+        } on PlatformException catch (error) {
+          showToast(Strings.strSomethingWentWrong);
+          debugPrint(error.toString());
+        }
       }
-    } catch (error, st) {
-      debugPrint("Some Error While Getting Products => $error \n StackTrace => $st");
+    } else {
+      // ignore: use_build_context_synchronously
+      Utils.noNetworkDialog(context, onRetry: (() {
+        Navigator.of(context).pop();
+        showSubscription(context);
+      }));
     }
   }
 
-  /// Get Available Product List
-  Future<List<Product>> getAvailableProducts({bool forceRefresh = false}) async {
-    if (productList.isNotEmpty && !forceRefresh) return productList;
-
+  static manageUser(SubscriptionTask task, String? newAppUserID) async {
+    //start loader
+    ProgressHud.showLoading();
     try {
-      productList = await _windowsIap.getProducts();
-      return productList;
-    } catch (error, st) {
-      debugPrint("Error getting products: $error \n $st");
-      return [];
-    }
-  }
-
-  Future<List<String>> getAddonLicenses() async {
-    try {
-      final licences = await _windowsIap.getAddonLicenses();
-      final licenceString = licences.entries.map((entry) => "Key:${entry.key} => Value: ${entry.value.toJson()}\n").toList();
-      // LogService.log("Licence List => $licenceString");
-      return licenceString;
-    } catch (error, st) {
-      debugPrint("Some Error While Getting Licences => $error \n StackTrace => $st");
-      return [];
-    }
-  }
-
-  /// Make a purchase
-  Future<bool> purchaseItem(String productId) async {
-    try {
-      final result = await _windowsIap.makePurchase(productId);
-      if (result == StorePurchaseStatus.succeeded) {
-        debugPrint("Purchase successful");
-        return true;
-      } else {
-        debugPrint("Purchase failed: $result");
-        return false;
+      if (task == SubscriptionTask.login) {
+        await Purchases.logIn(newAppUserID ?? '');
+      } else if (task == SubscriptionTask.logout) {
+        await Purchases.logOut();
+      } else if (task == SubscriptionTask.restore) {
+        await Purchases.restorePurchases();
       }
-    } catch (error, st) {
-      debugPrint("Error While Purchasing: $error, \n StackTrace => $st");
-      return false;
-    }
-  }
 
-  /// Check Purchase
-  Future<bool> isProductOwned(String storeId) async {
-    try {
-      final isPurchased = await _windowsIap.checkPurchase(storeId: storeId);
-      return isPurchased;
-    } catch (error, st) {
-      debugPrint("Error: $error \n Stack Trace $st");
-      return false;
+      //Set User Is Prime Or Not
+      await Utils.refreshSubscription();
+    } on PlatformException catch (error) {
+      showToast(Strings.strSomethingWentWrong);
+
+      debugPrint(error.toString());
     }
+    ProgressHud.dismiss();
   }
 }

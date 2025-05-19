@@ -1,5 +1,4 @@
-import 'package:transcribe/config/config.dart';
-
+import 'package:hive/hive.dart';
 import 'paragraphs.dart'; // Import Paragraphs class
 
 part 'responsemodel.g.dart'; // Generated Hive adapter file

@@ -14,8 +14,10 @@ class AudioDetail extends StatefulWidget {
 }
 
 class _AudioDetailState extends State<AudioDetail> {
-  final player.AudioPlayer globalAudioPlayer = player.AudioPlayer(); // Global audio player
-  final player.AudioPlayer paragraphAudioPlayer = player.AudioPlayer(); // Paragraph audio player
+  final player.AudioPlayer globalAudioPlayer =
+      player.AudioPlayer(); // Global audio player
+  final player.AudioPlayer paragraphAudioPlayer =
+      player.AudioPlayer(); // Paragraph audio player
 
   bool isPlaying = false;
   bool isGlobalPlaying = false;
@@ -73,7 +75,7 @@ class _AudioDetailState extends State<AudioDetail> {
           player.DeviceFileSource source = player.DeviceFileSource(filePath);
           await globalAudioPlayer.play(source);
         } else {
-          showToastMessage('Error while playing audio');
+          showToast('Error while playing audio');
         }
 
         // Pause paragraph audio if it's playing
@@ -99,7 +101,8 @@ class _AudioDetailState extends State<AudioDetail> {
 
   // Toggle paragraph play/pause
   // Toggle paragraph play/pause
-  Future<void> toggleParagraphPlayPause(int index, double start, double end) async {
+  Future<void> toggleParagraphPlayPause(
+      int index, double start, double end) async {
     try {
       // Pause global audio if it's playing
       if (isGlobalPlaying) {
@@ -122,7 +125,7 @@ class _AudioDetailState extends State<AudioDetail> {
       // Get the file path for the paragraph
       final filePath = await Utils.getAudioPath(widget.audioModel.filePath);
       if (filePath == '') {
-        showToastMessage('Error while playing paragraph');
+        showToast('Error while playing paragraph');
         return;
       }
 
@@ -152,7 +155,8 @@ class _AudioDetailState extends State<AudioDetail> {
     final transcript = widget.audioModel.responseModel?.paragraphs.transcript;
 
     // If paragraphs is null or empty, and transcript has a value, show the transcript
-    if ((paragraphs == null || paragraphs.isEmpty) && (transcript != null && transcript.isNotEmpty)) {
+    if ((paragraphs == null || paragraphs.isEmpty) &&
+        (transcript != null && transcript.isNotEmpty)) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
         child: SingleChildScrollView(
@@ -177,8 +181,12 @@ class _AudioDetailState extends State<AudioDetail> {
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 child: SelectableAutoLinkText(
-                  widget.audioModel.responseModel?.paragraphs.transcript ?? Strings.strNoResultFound,
-                  style: TextStyle(fontSize: Sizes.mediumFont, color: AppTheme.subtitleColor, fontWeight: FontWeight.w200),
+                  widget.audioModel.responseModel?.paragraphs.transcript ??
+                      Strings.strNoResultFound,
+                  style: TextStyle(
+                      fontSize: Sizes.mediumFont,
+                      color: AppTheme.subtitleColor,
+                      fontWeight: FontWeight.w200),
                 ),
               ),
             )
@@ -188,7 +196,8 @@ class _AudioDetailState extends State<AudioDetail> {
               itemBuilder: (context, paragraphIndex) {
                 final paragraph = paragraphs[paragraphIndex];
                 return Padding(
-                  padding: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
+                  padding:
+                      const EdgeInsets.only(left: 12, right: 12, bottom: 12),
                   child: Container(
                     padding: const EdgeInsets.all(12.0),
                     decoration: BoxDecoration(
@@ -221,9 +230,11 @@ class _AudioDetailState extends State<AudioDetail> {
                                   onPressed: () {
                                     Utils.sendAnalyticsEvent('TimelineCopyTap');
                                     Clipboard.setData(ClipboardData(
-                                      text: paragraph.sentences.map((sentence) => sentence.text).join(' '),
+                                      text: paragraph.sentences
+                                          .map((sentence) => sentence.text)
+                                          .join(' '),
                                     ));
-                                    showToastMessage('Copied');
+                                    showToast('Copied');
                                   },
                                 ),
                                 Padding(
@@ -236,21 +247,25 @@ class _AudioDetailState extends State<AudioDetail> {
                                       color: AppTheme.lightFontColor,
                                     ),
                                     onPressed: () {
-                                      Utils.sendAnalyticsEvent('TimelineShareTap');
+                                      Utils.sendAnalyticsEvent(
+                                          'TimelineShareTap');
                                       Share.share(
-                                        '${paragraph.sentences.map((sentence) => sentence.text).join(' ')}',
+                                        '${paragraph.sentences.map((sentence) => sentence.text).join(' ')} Appstore: $strAppstoreLink',
                                       );
                                     },
                                   ),
                                 ),
                                 FutureBuilder<String>(
-                                  future: Utils.getAudioPath(widget.audioModel.filePath),
+                                  future: Utils.getAudioPath(
+                                      widget.audioModel.filePath),
                                   builder: (context, snapshot) {
                                     return Visibility(
-                                      visible: snapshot.data != '' && snapshot.data != null,
+                                      visible: snapshot.data != '' &&
+                                          snapshot.data != null,
                                       child: IconButton(
                                         onPressed: () {
-                                          Utils.sendAnalyticsEvent('TimelinePlayPauseTap');
+                                          Utils.sendAnalyticsEvent(
+                                              'TimelinePlayPauseTap');
                                           toggleParagraphPlayPause(
                                             paragraphIndex,
                                             paragraph.start,
@@ -258,10 +273,15 @@ class _AudioDetailState extends State<AudioDetail> {
                                           );
                                         },
                                         icon: CircleAvatar(
-                                          backgroundColor: AppTheme.primaryColor,
+                                          backgroundColor:
+                                              AppTheme.primaryColor,
                                           radius: 15,
                                           child: Icon(
-                                            isParagraphPlaying[paragraphIndex] == true ? Icons.pause : Icons.play_arrow,
+                                            isParagraphPlaying[
+                                                        paragraphIndex] ==
+                                                    true
+                                                ? Icons.pause
+                                                : Icons.play_arrow,
                                             color: AppTheme.darkFontColor,
                                           ),
                                         ),
@@ -275,7 +295,9 @@ class _AudioDetailState extends State<AudioDetail> {
                         ),
                         const SizedBox(height: 8.0),
                         Text(
-                          paragraph.sentences.map((sentence) => sentence.text).join(' '),
+                          paragraph.sentences
+                              .map((sentence) => sentence.text)
+                              .join(' '),
                           style: TextStyle(
                             fontSize: Sizes.mediumFont,
                             color: AppTheme.subtitleColor,
@@ -322,7 +344,9 @@ class _AudioDetailState extends State<AudioDetail> {
                   children: [
                     Row(
                       children: [
-                        widget.audioModel.responseModel?.paragraphs.paragraphs?.isNotEmpty ?? false
+                        widget.audioModel.responseModel?.paragraphs.paragraphs
+                                    ?.isNotEmpty ??
+                                false
                             ? IconButton(
                                 splashColor: Colors.transparent,
                                 highlightColor: Colors.transparent,
@@ -331,9 +355,11 @@ class _AudioDetailState extends State<AudioDetail> {
                                   color: AppTheme.lightFontColor,
                                 ),
                                 onPressed: () {
-                                  Utils.sendAnalyticsEvent('FullTranscriptionTap');
+                                  Utils.sendAnalyticsEvent(
+                                      'FullTranscriptionTap');
                                   setState(() {
-                                    showFullTranscription = !showFullTranscription;
+                                    showFullTranscription =
+                                        !showFullTranscription;
                                   });
                                   //show Full transcription
                                 },
@@ -349,9 +375,11 @@ class _AudioDetailState extends State<AudioDetail> {
                           onPressed: () {
                             Utils.sendAnalyticsEvent('FullCopyTap');
                             Clipboard.setData(ClipboardData(
-                              text: widget.audioModel.responseModel?.paragraphs.transcript ?? Strings.strNoResultFound,
+                              text: widget.audioModel.responseModel?.paragraphs
+                                      .transcript ??
+                                  Strings.strNoResultFound,
                             ));
-                            showToastMessage('Copied');
+                            showToast('Copied');
                           },
                         ),
                         IconButton(
@@ -364,7 +392,7 @@ class _AudioDetailState extends State<AudioDetail> {
                           onPressed: () {
                             Utils.sendAnalyticsEvent('FullShareTap');
                             Share.share(
-                              '${widget.audioModel.responseModel?.paragraphs.transcript ?? Strings.strNoResultFound} } ',
+                              '${widget.audioModel.responseModel?.paragraphs.transcript ?? Strings.strNoResultFound} } Appstore: $strAppstoreLink',
                             );
                           },
                         ),
@@ -383,7 +411,9 @@ class _AudioDetailState extends State<AudioDetail> {
                               child: IconButton(
                                 onPressed: toggleGlobalPlayPause,
                                 icon: Icon(
-                                  isGlobalPlaying ? Icons.pause : Icons.play_arrow,
+                                  isGlobalPlaying
+                                      ? Icons.pause
+                                      : Icons.play_arrow,
                                   color: AppTheme.darkFontColor,
                                 ),
                               ),

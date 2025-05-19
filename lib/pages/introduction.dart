@@ -1,7 +1,6 @@
 import 'package:purchases_flutter/purchases_flutter.dart';
-// import 'package:rive/rive.dart' as rive;
+import 'package:rive/rive.dart' as rive;
 import 'package:transcribe/config/config.dart';
-import 'package:transcribe/config/windows_iap.dart';
 import 'package:transcribe/pages/home.dart';
 import 'package:transcribe/pages/subscription.dart';
 import 'package:transcribe/pages/tabbar.dart';
@@ -17,12 +16,32 @@ class OnBoardingPageState extends State<Introduction> {
   Future<void> _onIntroEnd(context) async {
     try {
       Utils.addUser(isIntroLoaded: true);
-      await WindowsIap().getProducts();
-      await StoreConfig().refreshSubscription();
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Tabbar()));
+      var offerings = await Purchases.getOfferings();
+      await Utils.refreshSubscription();
+
+      if (inReview) {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => const Tabbar()));
+      } else if (offerings.current != null && !isUserSubscribed) {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => Subscription(
+                      offering: offerings.current!,
+                      isFromIntro: true,
+                    )));
+      } else {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => const Tabbar()));
+      }
     } catch (e) {
       debugPrint(e.toString());
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Tabbar()));
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (BuildContext context) => const Tabbar()));
     }
   }
 
@@ -36,21 +55,27 @@ class OnBoardingPageState extends State<Introduction> {
           mainAxisAlignment: MainAxisAlignment.center,
           spacing: 12,
           children: [
-            // SizedBox(
-            //   height: 200,
-            //   width: 200,
-            //   child: rive.RiveAnimation.asset(
-            //     AssetsPath.audioRive,
-            //   ),
-            // ), //TODO
+            SizedBox(
+              height: 200,
+              width: 200,
+              child: rive.RiveAnimation.asset(
+                AssetsPath.audioRive,
+              ),
+            ),
             Text(
               'Welcome to $strAppName',
-              style: TextStyle(color: AppTheme.primaryColor, fontWeight: FontWeight.bold, fontSize: Sizes.extraLargeFont),
+              style: TextStyle(
+                  color: AppTheme.primaryColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: Sizes.extraLargeFont),
             ),
             Text(
               'Transform Your Audio Into Text Instantly!',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppTheme.lightFontColor, fontSize: Sizes.largeFont, fontWeight: FontWeight.w100),
+              style: TextStyle(
+                  color: AppTheme.lightFontColor,
+                  fontSize: Sizes.largeFont,
+                  fontWeight: FontWeight.w100),
             ),
             const Padding(
               padding: EdgeInsets.only(right: 25, left: 25),
@@ -86,7 +111,8 @@ class OnBoardingPageState extends State<Introduction> {
               height: 44,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryColor, // Replace with your desired color
+                  backgroundColor:
+                      AppTheme.primaryColor, // Replace with your desired color
                 ),
                 onPressed: () {
                   _onIntroEnd(context);
