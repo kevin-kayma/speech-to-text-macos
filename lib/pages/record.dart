@@ -5,11 +5,14 @@ import 'package:transcribe/config/config.dart';
 import 'package:transcribe/apis/network.dart';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:transcribe/extension/padding_extension.dart';
 import 'package:transcribe/models/audiomodel.dart';
 import 'package:transcribe/models/boxes.dart';
 import 'package:transcribe/models/listaudiomodel.dart';
 import 'package:transcribe/models/paragraphs.dart';
 import 'package:transcribe/models/responsemodel.dart';
+import 'package:transcribe/pages/audiodetails.dart';
+import 'package:transcribe/pages/result_page.dart';
 
 import 'dart:io';
 
@@ -49,7 +52,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
     });
     audioPlayer.onPlayerComplete.listen((event) {
       setState(() {
-        isPlaying = false; // Toggle the state
+        isPlaying = false;
       });
     });
   }
@@ -63,6 +66,8 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
   }
 
   Future startRecord(BuildContext context) async {
+    Utils.sendAnalyticsEvent(AnalyticsEvents.startRecord);
+
     bool isConnection = await Utils.checkInternet();
     if (isConnection) {
       try {
@@ -81,7 +86,6 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
               ),
               path: exPath,
             );
-// Add a small delay to ensure the recorder has started
             await Future.delayed(const Duration(milliseconds: 200));
 
             isRecording = await recorder.isRecording();
@@ -110,6 +114,8 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
   }
 
   Future stopRecorder() async {
+    Utils.sendAnalyticsEvent(AnalyticsEvents.stopRecord);
+
     filePath = await recorder.stop() ?? '';
     isRecording = await recorder.isRecording();
 
@@ -120,8 +126,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
     ref.read(isVoiceRecordLoadingProvider.notifier).state = true;
 
     if (!mounted) return;
-    responsemodel =
-        await ApiService.speechToTextDG(filePath, languageCode, context);
+    responsemodel = await ApiService.speechToTextDG(filePath, languageCode, context);
     ref.read(isVoiceRecordLoadingProvider.notifier).state = false;
 
     //Add in databse
@@ -149,8 +154,7 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
         ),
       );
     } else {
-      strSpeechResult =
-          responsemodel?.paragraphs.transcript ?? Strings.strNoResultFound;
+      strSpeechResult = responsemodel?.paragraphs.transcript ?? Strings.strNoResultFound;
     }
 
     setState(() {});
@@ -182,16 +186,17 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
     }
   }
 
-  saveRecording() async {
+  Future<AudioModel> saveRecording() async {
     //Save Record In History
+    Utils.sendAnalyticsEvent(AnalyticsEvents.saveRecord);
     final audioBox = Boxes.getAudio();
     final audio = audioBox.get(Keys.keyAudioID);
     if (audio is AudioModel && audio != null) {
-      audioID = audio.audioList.last.id;
+      tempAudioId = audio.audioList.last.id;
     }
-    audioID++;
+    tempAudioId++;
     final audioModel = AudioModel(
-      id: audioID,
+      id: tempAudioId,
       filename: filename,
       filePath: filePath,
       date: Utils.getCurrentDateAndTime(),
@@ -202,6 +207,8 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
 
     final audioHistory = UserAudioHistory()..audioList = listAudio;
     await audioBox.put(Keys.keyAudioID, audioHistory);
+    ref.read(audioListProvider.notifier).loadAudioHistory();
+    return audioModel;
   }
 
   @override
@@ -214,206 +221,222 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
         backgroundColor: AppTheme.scaffoldBackgroundColor,
         foregroundColor: AppTheme.lightFontColor,
         title: const Text(Strings.strRecordAudio),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(children: [
-            Expanded(
-              child: strSpeechResult != ''
-                  ? SelectableAutoLinkText(
-                      strSpeechResult,
-                      style: TextStyle(
-                          color: AppTheme.lightFontColor,
-                          // fontWeight: FontWeight.w500,
-                          fontSize: Sizes.largeFont),
-                      // items: [
-                      //   CustomSelectableTextItem(
-                      //       controlType: SelectionControlType.copy),
-                      //   CustomSelectableTextItem(
-                      //       controlType: SelectionControlType.selectAll),
-                      //   CustomSelectableTextItem(
-                      //       label: Strings.strShare,
-                      //       controlType: SelectionControlType.other,
-                      //       onPressed: (text) {
-                      //         Share.share(text);
-                      //       }),
-                      // ],
-                    )
-                  : Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Text(
-                          Strings.strNoRecordAudio,
-                          style: TextStyle(
-                            fontSize: Sizes.mediumFont,
-                            color: AppTheme.greyFontColor,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-            ),
-            isRecording && isPause
-                ? Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: Lottie.asset(
-                      AssetsPath.recording,
-                      width: 40,
-                      height: 40,
-                      fit: BoxFit.fill,
-                    ),
-                  )
-                : const SizedBox(),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Visibility(
-                  visible: filePath.isNotEmpty &&
-                      !isRecording &&
-                      strSpeechResult != '',
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 12.0),
-                    child: CircleAvatar(
-                      backgroundColor: AppTheme.primaryColor,
-                      radius: Sizes.radius,
-                      child: IconButton(
-                        onPressed: togglePlayPause,
-                        icon: Icon(
-                          isPlaying ? Icons.pause : Icons.play_arrow,
-                          color: AppTheme.darkFontColor,
-                        ),
-                      ),
+        actions: responsemodel == null
+            ? []
+            : [
+                InkWell(
+                  onTap: () {
+                    onSaveRecord(context, ref);
+                  },
+                  child: Text(
+                    'Save',
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      color: AppTheme.primaryColor,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
-                isRecording
-                    ? CircleAvatar(
-                        backgroundColor: Colors.redAccent,
-                        radius: Sizes.radius,
-                        child: IconButton(
-                          onPressed: () async {
-                            stopRecorder();
-                            setState(() {});
-                          },
-                          icon: HugeIcon(
-                            icon: HugeIcons.strokeRoundedSquare,
-                            color: AppTheme.darkFontColor,
-                          ),
-                        ),
-                      )
-                    : isAudioLoading
-                        ? const Padding(
-                            padding: EdgeInsets.only(bottom: 15.0),
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 3,
+                const SizedBox(width: 20),
+              ],
+      ),
+      body: SafeArea(
+        child: responsemodel != null
+            ? ResultWidget(responsemodel: responsemodel!, audioPath: filePath)
+            : Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: strSpeechResult != ''
+                          ? SelectableAutoLinkText(
+                              strSpeechResult,
+                              style: TextStyle(
+                                color: AppTheme.lightFontColor,
+                                fontSize: Sizes.largeFont,
+                              ),
+                            )
+                          : Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Text(
+                                  Strings.strNoRecordAudio,
+                                  style: TextStyle(
+                                    fontSize: 17.sp,
+                                    color: AppTheme.greyFontColor,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ).paddingSymmetric(horizontal: 30),
+                              ),
+                            ),
+                    ),
+                    isRecording && isPause
+                        ? Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: Lottie.asset(
+                              AssetsPath.recording,
+                              width: 60,
+                              height: 60,
+                              fit: BoxFit.fill,
                             ),
                           )
-                        : Visibility(
-                            visible: strSpeechResult == '',
+                        : const SizedBox(),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Visibility(
+                          visible: filePath.isNotEmpty && !isRecording && strSpeechResult != '',
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 12.0),
                             child: CircleAvatar(
                               backgroundColor: AppTheme.primaryColor,
                               radius: Sizes.radius,
                               child: IconButton(
-                                onPressed: () async {
-                                  await startRecord(context);
-                                },
-                                icon: HugeIcon(
-                                  icon: HugeIcons.strokeRoundedMic01,
+                                onPressed: togglePlayPause,
+                                icon: Icon(
+                                  isPlaying ? Icons.pause : Icons.play_arrow,
                                   color: AppTheme.darkFontColor,
                                 ),
                               ),
                             ),
                           ),
-                SizedBox(
-                  width: isRecording ? 12 : 0,
-                ),
-                isRecording
-                    ? isPause
-                        ? CircleAvatar(
-                            backgroundColor: AppTheme.primaryColor,
-                            radius: Sizes.radius,
-                            child: IconButton(
-                              onPressed: () {
-                                isPause = false;
-                                isResume = true;
-
-                                recorder.pause().then((_) {
-                                  // Use then() to handle the result
-                                  setState(() {});
-                                });
-                              },
-                              icon: HugeIcon(
-                                icon: HugeIcons.strokeRoundedPause,
-                                color: AppTheme.darkFontColor,
-                              ),
-                            ),
-                          )
-                        : CircleAvatar(
-                            backgroundColor: AppTheme.primaryColor,
-                            radius: Sizes.radius,
-                            child: IconButton(
-                              onPressed: () {
-                                isPause = true;
-                                isResume = false;
-
-                                recorder.resume().then((_) {
-                                  // Use then() to handle the result
-                                  setState(() {});
-                                });
-                              },
-                              icon: HugeIcon(
-                                icon: HugeIcons.strokeRoundedPlay,
-                                color: AppTheme.darkFontColor,
-                              ),
-                            ),
-                          )
-                    : const SizedBox(),
-                SizedBox(
-                  width: strSpeechResult != '' || isRecording ? 12 : 0,
-                ),
-                Visibility(
-                  visible: strSpeechResult != '' && !isRecording,
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        backgroundColor: AppTheme.primaryColor,
-                        radius: Sizes.radius,
-                        child: IconButton(
-                          onPressed: () {
-                            Clipboard.setData(
-                                ClipboardData(text: strSpeechResult));
-                            showToast('Copied');
-                          },
-                          icon: HugeIcon(
-                            icon: HugeIcons.strokeRoundedCopy01,
-                            color: AppTheme.darkFontColor,
-                          ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      CircleAvatar(
-                        backgroundColor: AppTheme.primaryColor,
-                        radius: Sizes.radius,
-                        child: IconButton(
-                          onPressed: () {
-                            onSaveRecord(context, ref);
-                          },
-                          icon: HugeIcon(
-                            icon: HugeIcons.strokeRoundedDownload01,
-                            color: AppTheme.darkFontColor,
-                          ),
+                        isRecording
+                            ? CircleAvatar(
+                                backgroundColor: Colors.redAccent,
+                                radius: Sizes.radius,
+                                child: IconButton(
+                                  onPressed: () async {
+                                    await stopRecorder();
+                                    await Future.delayed(Durations.medium1);
+                                    setState(() {});
+                                  },
+                                  icon: const HugeIcon(
+                                    icon: HugeIcons.strokeRoundedSquare,
+                                    color: AppTheme.darkFontColor,
+                                  ),
+                                ),
+                              )
+                            : isAudioLoading
+                                ? const Padding(
+                                    padding: EdgeInsets.only(bottom: 15.0),
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 3,
+                                    ),
+                                  )
+                                : Visibility(
+                                    visible: strSpeechResult == '',
+                                    child: ElevatedButton.icon(
+                                      icon: const HugeIcon(
+                                        icon: HugeIcons.strokeRoundedMic01,
+                                        color: AppTheme.darkFontColor,
+                                      ),
+                                      onPressed: () async {
+                                        await startRecord(context);
+                                      },
+                                      label: const Text(
+                                        'Record Audio',
+                                        style: TextStyle(color: AppTheme.darkFontColor),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        backgroundColor: AppTheme.primaryColor,
+                                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                                      ),
+                                    ),
+                                  ),
+                        SizedBox(
+                          width: isRecording ? 12 : 0,
                         ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ]),
-        ),
+                        isRecording
+                            ? isPause
+                                ? CircleAvatar(
+                                    backgroundColor: AppTheme.primaryColor,
+                                    radius: Sizes.radius,
+                                    child: IconButton(
+                                      onPressed: () {
+                                        isPause = false;
+                                        isResume = true;
+
+                                        recorder.pause().then((_) {
+                                          // Use then() to handle the result
+                                          setState(() {});
+                                        });
+                                      },
+                                      icon: const HugeIcon(
+                                        icon: HugeIcons.strokeRoundedPause,
+                                        color: AppTheme.darkFontColor,
+                                      ),
+                                    ),
+                                  )
+                                : CircleAvatar(
+                                    backgroundColor: AppTheme.primaryColor,
+                                    radius: Sizes.radius,
+                                    child: IconButton(
+                                      onPressed: () {
+                                        isPause = true;
+                                        isResume = false;
+
+                                        recorder.resume().then((_) {
+                                          // Use then() to handle the result
+                                          setState(() {});
+                                        });
+                                      },
+                                      icon: const HugeIcon(
+                                        icon: HugeIcons.strokeRoundedPlay,
+                                        color: AppTheme.darkFontColor,
+                                      ),
+                                    ),
+                                  )
+                            : const SizedBox(),
+                        SizedBox(
+                          width: strSpeechResult != '' || isRecording ? 12 : 0,
+                        ),
+                        Visibility(
+                          visible: strSpeechResult != '' && !isRecording,
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                backgroundColor: AppTheme.primaryColor,
+                                radius: Sizes.radius,
+                                child: IconButton(
+                                  onPressed: () {
+                                    Clipboard.setData(ClipboardData(text: strSpeechResult));
+                                    showToast('Copied', AppTheme.darkFontColor);
+                                  },
+                                  icon: const HugeIcon(
+                                    icon: HugeIcons.strokeRoundedCopy01,
+                                    color: AppTheme.darkFontColor,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              CircleAvatar(
+                                backgroundColor: AppTheme.primaryColor,
+                                radius: Sizes.radius,
+                                child: IconButton(
+                                  onPressed: () {
+                                    onSaveRecord(context, ref);
+                                  },
+                                  icon: const HugeIcon(
+                                    icon: HugeIcons.strokeRoundedDownload01,
+                                    color: AppTheme.darkFontColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                ),
+              ),
       ),
     );
   }
@@ -422,84 +445,75 @@ class _RecordAudioState extends ConsumerState<RecordAudio> {
     showModalBottomSheet<void>(
       isDismissible: true,
       enableDrag: true,
+      backgroundColor: AppTheme.greyBackgroundColor,
       context: context,
-      backgroundColor: AppTheme.scaffoldBackgroundColor,
+      isScrollControlled: false,
       builder: (BuildContext context) {
         return Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Enter Recording Title',
-                    style: TextStyle(
-                        fontSize: Sizes.mediumFont,
-                        color: AppTheme.lightFontColor,
-                        fontWeight: FontWeight.bold),
+          padding: EdgeInsets.zero,
+          child: SizedBox(
+            height: 30.w,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Enter Recording Title',
+                        style: TextStyle(
+                            fontSize: Sizes.mediumFont, fontWeight: FontWeight.bold, color: AppTheme.lightFontColor),
+                      ),
+                      spacer(),
+                      CloseButton(
+                        onPressed: () async {
+                          Navigator.pop(context);
+                        },
+                      )
+                    ],
                   ),
                   spacer(),
-                  CloseButton(
-                    color: AppTheme.darkFontColor,
+                  Expanded(
+                    child: TextFormField(
+                      focusNode: focusNode,
+                      style: const TextStyle(color: AppTheme.lightFontColor),
+                      controller: textEditingController,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter Title',
+                        fillColor: AppTheme.textFieldBackgroundColor,
+                        filled: true,
+                        focusColor: AppTheme.greyBackgroundColor,
+                      ),
+                    ),
+                  ),
+                  spacer(),
+                  ElevatedButton(
                     onPressed: () async {
-                      Navigator.pop(context);
+                      if (textEditingController.text != '') {
+                        filename = textEditingController.text;
+                        textEditingController.text = '';
+                        final model = await saveRecording();
+
+                        showToast("Saved In History", AppTheme.primaryColor, ToastGravity.CENTER);
+                        Navigator.pop(context);
+                        Navigator.pushReplacement(
+                            context, MaterialPageRoute(builder: (context) => AudioDetail(audioModel: model)));
+                      } else {
+                        showToast('Please enter recording title', Colors.red, ToastGravity.CENTER);
+                      }
                     },
-                  )
+                    child: const Text(
+                      Strings.strSave,
+                      style: TextStyle(color: AppTheme.darkFontColor),
+                    ),
+                  ),
+                  spacer()
                 ],
               ),
-              spacer(),
-              TextField(
-                focusNode: focusNode,
-                controller: textEditingController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: AppTheme.greyBackgroundColor, width: 3.0),
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: AppTheme.greyBackgroundColor, width: 3.0),
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  hintText: 'Enter Title',
-                  hintStyle: TextStyle(color: Colors.grey.shade700),
-                  fillColor: AppTheme.textFieldBackgroundColor,
-                  filled: true,
-                  focusColor: AppTheme.greyBackgroundColor,
-                ),
-                style: TextStyle(
-                  color: AppTheme
-                      .lightFontColor, // Change to your desired text color
-                ),
-              ),
-              spacer(),
-              ElevatedButton(
-                onPressed: () async {
-                  if (textEditingController.text != '') {
-                    filename = textEditingController.text;
-                    textEditingController.text = '';
-                    await saveRecording();
-
-                    showToast("Saved In History", AppTheme.primaryColor,
-                        ToastGravity.CENTER);
-                    // ignore: use_build_context_synchronously
-                    Navigator.pop(context);
-                  } else {
-                    showToast('Please enter recording title', Colors.red,
-                        ToastGravity.CENTER);
-                  }
-                },
-                child: Text(
-                  Strings.strSave,
-                  style: TextStyle(color: AppTheme.darkFontColor),
-                ),
-              ),
-              spacer()
-            ],
+            ),
           ),
         );
       },

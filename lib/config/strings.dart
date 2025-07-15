@@ -17,8 +17,7 @@ class Strings {
   static const strFeedback = 'Write Your Feedback';
   static const strSubscribe = 'Continue';
   static const strUpgrade = 'UPGRADE TO PREMIUM';
-  static const strEnjoyAccess =
-      'Enjoy unlimited transcriptions and many more features.';
+  static const strEnjoyAccess = 'Enjoy unlimited transcriptions and many more features.';
   static const strSkip = 'skip';
   static const strWeekly = 'Weekly';
   static const strWeeklyTrial = 'Weekly (3 Days Free Trial)';
@@ -35,14 +34,12 @@ class Strings {
   static const strSomethingWentWrong = 'Something Went Wrong';
   static const strTryAgainLater = 'Please try again later';
   static const strNoNetwork = 'No Network';
-  static const strNoInternetConnectionMessage =
-      'Please check your internet connection and try again.';
+  static const strNoInternetConnectionMessage = 'Please check your internet connection and try again.';
   static const strUpgradePremium = 'Upgrade to premium';
   static const strOr = 'Or';
   static const strDone = 'Done';
   static const strRetry = 'Retry';
-  static const strSubscribeToast =
-      'Please subscribe in order to access all of the features.';
+  static const strSubscribeToast = 'Please subscribe in order to access all of the features.';
   static const strLanguageTitle = 'Change Language';
   static const strSave = 'Save';
   static const strHelp = 'Rate Now';
@@ -57,19 +54,16 @@ class Strings {
   static const String strSubscriptionFooteriOS =
       'Payment will be charged to your Apple ID account at the confirmation of purchase. The subscription will automatically renew unless auto-renew is turned off at least 24 hours before the end of the current period.';
 
-  static const String strChatAlertTitle =
-      'Do you want to clear all audio list?';
+  static const String strChatAlertTitle = 'Do you want to clear all audio list?';
   static const String strChatAlertSubTitle = 'This action can\'t be undone';
   static const String strNo = 'No';
   static const String strYes = 'Yes';
   static const String strHistoryTitle = 'Do you want to clear chat?';
-  static const String strGrantAudioPermission =
-      'Please grant record audio permission in system settings.';
+  static const String strGrantAudioPermission = 'Please grant record audio permission in system settings.';
   static const String strFreeTrial = 'Try For Free';
   static const String strAudioToText = 'Audio To Text';
   static const String strNoResultFound = 'No Result Found';
-  static const String strLargeFile =
-      'The file you are trying to upload is too large.';
+  static const String strLargeFile = 'The file you are trying to upload is too large.';
   static const String strNoAudioMsg =
       'Convert audio files, such as recordings of interviews into written text for easier reference, analysis, or sharing.';
   static const String strImportAudio = 'Import Audio';
@@ -85,12 +79,20 @@ class Strings {
   static const String listFeatures6 = 'Unlimited audio transcription';
   static const String listFeatures7 = 'No Ads';
   static const String bestOffer = 'Best Offer';
+  // static const listFeatures = [
+  //   '🔄 Unlimited transcriptions',
+  //   '📁 Large file support',
+  //   '⚡ Faster processing',
+  //   '💬 Premium support'
+  // ];
   static const listFeatures = [
-    '🔄 Unlimited transcriptions',
-    '📁 Large file support',
-    '⚡ Faster processing',
-    '💬 Premium support'
+    "🤖 AI Chatbot — No Limits",
+    "📝 Endless Transcriptions",
+    "⚡ Instant AI Summaries",
+    "🎙️ Record or Import Any Audio",
+    "🌍 Supports 100+ Languages",
   ];
+
   static const listIntroduction = [
     '📂 Upload audio and transcribe',
     '🌍 Supports multiple languages',
@@ -102,6 +104,9 @@ class Strings {
 
 class EnvKeys {
   EnvKeys._();
+
+  static const secretKey = 'SECRET_KEY';
+  static const geminiKey = 'GEMINI_KEY';
   static const deepLinkKey = 'DEEPLINK_KEY';
 }
 
@@ -114,14 +119,18 @@ class StatusCode {
 class AssetsPath {
   AssetsPath._();
 
-  static String imagePath = "assets/images";
-  static String animationPath = "assets/lottie";
-  static String rivePath = "assets/rive";
-  static String audioRive = '$rivePath/record.riv';
-
-  static String giftjson = '$animationPath/gift1.json';
-  static String loaderJson = '$animationPath/loader.json';
-  static String recording = '$animationPath/recording.json';
+  static const String imagePath = "assets/images";
+  static const String animationPath = "assets/lottie";
+  static const String rivePath = "assets/rive";
+  static const String audioRive = '$rivePath/record.riv';
+  static const String giftjson = '$animationPath/gift1.json';
+  static const String loaderJson = '$animationPath/loader.json';
+  static const String recording = '$animationPath/recording.json';
+  static const String transcribe = "$imagePath/transcribe.png";
+  static const String transcribeTwo = "$imagePath/transcribe_two.png";
+  static const String transcribeThree = "$imagePath/transcribe_three.png";
+  static const String transcribeFour = "$imagePath/transcribe_four.png";
+  static const String transcribeFive = "$imagePath/transcribe_five.png";
 }
 
 //App Routes
@@ -131,7 +140,6 @@ class AppRoutes {
   static const home = 'home';
   static const intro = 'intro';
   static const tabbar = 'tabbar';
-  static const setting = 'setting';
   static const history = 'history';
   static const subscription = 'subscription';
 }
@@ -188,47 +196,91 @@ class Keys {
   static const String keyUserID = 'userid';
   static const String keyHistoryID = 'historyid';
   static const String keyAudioID = 'audioid';
+}
 
-  //Analytics
-  static const String strAnlSubscription = 'Subscription_Card';
-  static const String strAnlAudio = 'Audio';
-  static const String strAnlSettingTerms = 'Settings_Terms_Of_Use';
-  static const String strAnlSettingPrivacy = 'Settings_Privacy_Policy';
-  static const String strAnlSettingRateApp = 'Settings_Rate_App';
-  static const String strAnlSettingLanguage = 'Settings_Language';
-  static const String strAnlSettingFeedback = 'Settings_Feedback';
-  static const String strAnlSettingShareApp = 'Settings_Share_App';
-  static const String strAnlPurchasePlan = 'Purchase_plan';
-  static const String strAnlAudioDone = 'Audio_Done';
-  static const String strAnlHelpUsReview = 'Clicked_on_help_us_review';
-  static const String strAnlHistoryChecked = 'History_Checked';
-  static const String strAnlAudioChecked = 'Audio_checked';
-  static const String strAnlDeepgramProcess = 'Deepgram_process';
-  static const String strAnlDeepgramDone = 'Deepgram_done';
-  static const String strAnlDeepgramCatch = 'Deepgram_catch';
-  static String strAnlAudioServerProcess = 'Audio_Server_Process';
-  static String strAnlAudioServerDone = 'Audio_Server_Done';
+class AnalyticsEvents {
+  AnalyticsEvents._();
 
-  static const String strAnlOb1View = 'Ob1_view';
-  static const String strAnlObView = 'Ob_view';
-  static const String strAnlObDone = 'Ob_done';
+  //Home Screen
+  static const String recordAudioTap = 'Record_home_Tap';
+  static const String importFileTap = 'Import_home_Tap';
+  static String selectLanguage(String lang) => 'Choose_Lang_$lang';
 
-//Source View
-  static String get sourceView => '${currentSource.name}_view';
+  ///Record Screen
+  static String startRecord = 'Start_${currentSource.name}_Record';
+  static String stopRecord = 'Stop_${currentSource.name}_Record';
+  static String saveRecord = 'Save_${currentSource.name}_Record';
 
-//Subscription Screen
-  static String get proSourceView => 'Pro_${currentSource.name}_view';
-  static String get proSourceAccess => 'Pro_${currentSource.name}_limit';
+  /// Transcription Screen
+  static String transcriptionCardTap = 'Trs_${currentSource.name}_Tap';
+  static String summaryTap = 'Summary_${currentSource.name}_Tap';
+  static String chatBotTap = 'Chatbot_${currentSource.name}_Tap';
+  static String editName = 'Menu_${currentSource.name}_Edit_Name';
+  static String deleteTranscription = 'Menu_${currentSource.name}_Delete_Trs';
+  static String editTranscription = 'Menu_${currentSource.name}_Edit_Full';
+  static String editParagraph = 'Edit_${currentSource.name}_Para';
+  static String shareFull = 'Share_${currentSource.name}_Full';
+  static String sharePara = 'Share_${currentSource.name}_Para';
+  static String copyFull = 'Copy_${currentSource.name}_Full';
+  static String copyPara = 'Copy_${currentSource.name}_Para';
+  static String playFull = 'Play_${currentSource.name}_Full';
+  static String playPara = 'Play_${currentSource.name}_Para';
+  static String toggleTranscription = 'Toggle_${currentSource.name}_Trs';
+  static String editSummary = 'Edit_${currentSource.name}_Summary';
+  static String shareSummary = 'Share_${currentSource.name}_Summary';
+  static String copySummary = 'Copy_${currentSource.name}_Summary';
+  static String sendChat = 'Send_${currentSource.name}_Chat';
+
+  /// Deep Gram API
+  static const String deepgramProcess = 'Deepgram_Process';
+  static const String deepgramDone = 'Deepgram_Done';
+  static const String deepgramCatch = 'Deepgram_Catch';
+
+  /// Onboarding
+  static const String obView = 'Ob_View';
+  static const String obDone = 'Ob_Done';
+  static const String helpUsReview = 'Help_Us_Tap';
+
+  static String get sourceView => '${currentSource.name}_View';
+  static String get sourceClose => '${currentSource.name}_Close';
+
+  /// Settings
+  static const String subscription = 'Subscription_Card';
+  static const String settingTerms = 'Settings_Terms_Of_Use';
+  static const String settingPrivacy = 'Settings_Privacy_Policy';
+  static const String settingRateApp = 'Settings_Rate_App';
+  static const String settingLanguage = 'Settings_Language';
+  static const String settingFeedback = 'Settings_Feedback';
+  static const String settingShareApp = 'Settings_Share_App';
+
+  /// Subscription Screen
+  static String get proSourceView => 'Pro_${currentSource.name}_View';
+  static String get proSourceAccess => 'Pro_${currentSource.name}_Limit';
   static String get proSIdTap => 'Pro_${currentSource.name}_${currentID}_Tap';
-  static String get proSIdSuccess =>
-      'Pro_${currentSource.name}_${currentID}_success';
-  static String get proSClose => 'Pro_${currentSource.name}_close';
-  static String get proSIdFailure =>
-      'Pro_${currentSource.name}_${currentID}_failure';
+  static String get proSIdSuccess => 'Pro_${currentSource.name}_${currentID}_Success';
+  static String get proSClose => 'Pro_${currentSource.name}_Close';
+  static String get proSIdFailure => 'Pro_${currentSource.name}_${currentID}_Failure';
+
+  /// Trial Paywall
+  static String get trialSourceView => 'Trial_${currentSource.name}_View';
+  static String get trialSourceAccess => 'Trial_${currentSource.name}_Limit';
+  static String get trialSIdTap => 'Trial_${currentSource.name}_${currentID}_Tap';
+  static String get trialSIdSuccess => 'Trial_${currentSource.name}_${currentID}_Success';
+  static String get trialSClose => 'Trial_${currentSource.name}_Close';
+  static String get trialSIdFailure => 'Trial_${currentSource.name}_${currentID}_Failure';
 }
 
 //Source Flow
-enum Source { ob, settings, home, opened, launch, card, audio, record, image }
+enum Source {
+  ob,
+  settings,
+  home,
+  history,
+  file,
+  record,
+}
+
+//Source Flow
 
 Source currentSource = Source.ob;
 

@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
-
 import 'package:transcribe/config/config.dart';
 import 'package:transcribe/apis/network.dart';
+import 'package:transcribe/config/session.dart';
+import 'package:transcribe/models/chat_message.dart';
 import 'package:transcribe/models/models.dart';
 import 'package:transcribe/models/paragraph.dart';
 import 'package:transcribe/models/paragraphs.dart';
@@ -13,7 +13,6 @@ import 'package:transcribe/models/responsemodel.dart';
 import 'package:transcribe/models/sentence.dart';
 import 'package:transcribe/pages/home.dart';
 import 'package:transcribe/pages/introduction.dart';
-import 'package:transcribe/pages/settings.dart';
 import 'package:transcribe/pages/tabbar.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -32,7 +31,6 @@ void main() async {
     // } else {
     //   FlutterError.onError =
     //       FirebaseCrashlytics.instance.recordFlutterFatalError;
-    // } //TODO
 
     await initialSetup();
     runApp(const ProviderScope(child: MainApp()));
@@ -56,6 +54,7 @@ Future<void> initialSetup() async {
   // Open the Hive box for the User model
   await Hive.openBox<UserAudioHistory>(Keys.keyBoxAudio);
   await Hive.openBox<User>(Keys.keyBoxUser);
+  await Hive.openBox(SessionKeys.userBox);
 
   final user = Boxes.getUser();
   final userInfo = user.get(Keys.keyUserID);
@@ -63,9 +62,16 @@ Future<void> initialSetup() async {
 
   await ApiService.getInitData();
 
-  if (initAlertData.entitlementID != '' &&
-      initAlertData.entitlementID != null) {
+  if (initAlertData.entitlementID != '' && initAlertData.entitlementID != null) {
     entitlementID = initAlertData.entitlementID ?? entitlementID;
+  }
+
+  if (initAlertData.intMaxChat != '' && initAlertData.intMaxChat != null) {
+    maxChatCount = int.parse(initAlertData.intMaxChat ?? '0');
+  }
+
+  if (initAlertData.intMaxSummary != '' && initAlertData.intMaxSummary != null) {
+    maxSummaryCount = int.parse(initAlertData.intMaxSummary ?? '0');
   }
 
   //Subscription Store Setup
@@ -74,10 +80,11 @@ Future<void> initialSetup() async {
   // Set minimum window size
   if (Platform.isMacOS) {
     await windowManager.ensureInitialized();
-    await windowManager.setMinimumSize(const Size(850, 700));
+    await windowManager.setMinimumSize(const Size(900, 600));
 
     // Explicitly set the initial window size right after initialization
-    await windowManager.setSize(const Size(850, 700));
+    await windowManager.setSize(const Size(900, 700));
+    // windowManager.setAspectRatio(6 / 4);
   }
 }
 
@@ -89,6 +96,8 @@ registerHiveAdapters() {
   Hive.registerAdapter(ParagraphsAdapter());
   Hive.registerAdapter(ParagraphAdapter());
   Hive.registerAdapter(SentenceAdapter());
+  Hive.registerAdapter(ChatMessageAdapter());
+  Hive.registerAdapter(MessageSenderAdapter());
 }
 
 class MainApp extends StatelessWidget {
@@ -98,7 +107,6 @@ class MainApp extends StatelessWidget {
   // static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   // static FirebaseAnalyticsObserver observer =
   //     FirebaseAnalyticsObserver(analytics: analytics);
-  //TODO:
   @override
   Widget build(BuildContext context) {
     return ResponsiveSizer(
@@ -109,20 +117,19 @@ class MainApp extends StatelessWidget {
             scrollBehavior: const MaterialScrollBehavior().copyWith(
               dragDevices: {
                 PointerDeviceKind.mouse,
-                PointerDeviceKind.trackpad,
+                // PointerDeviceKind.trackpad,
               },
             ),
             title: strAppName,
             debugShowCheckedModeBanner: false,
             theme: AppTheme.darkTheme,
             themeMode: isDarkTheme ? ThemeMode.dark : ThemeMode.light,
-            // navigatorObservers: <NavigatorObserver>[observer],//TODO
+            // navigatorObservers: <NavigatorObserver>[observer],
             initialRoute: isIntroLoaded ? AppRoutes.tabbar : AppRoutes.intro,
             routes: {
               AppRoutes.home: (_) => const MyHomePage(),
               AppRoutes.tabbar: (_) => const Tabbar(),
               AppRoutes.intro: (_) => const Introduction(),
-              AppRoutes.setting: (_) => const Settings(),
             },
           ),
         );

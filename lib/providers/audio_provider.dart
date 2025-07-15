@@ -1,24 +1,73 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart';
 import 'package:transcribe/apis/network.dart';
 import 'package:transcribe/config/config.dart';
+import 'package:transcribe/extension/string_extension.dart';
+import 'package:transcribe/models/chat_message.dart';
 import 'package:transcribe/models/models.dart';
 import 'package:transcribe/models/responsemodel.dart';
+import 'package:transcribe/pages/pages.dart';
 import 'package:transcribe/providers/providers.dart';
 
 final isAudioLoadingProvider = StateProvider<bool>((ref) => false);
 final isVoiceRecordLoadingProvider = StateProvider<bool>((ref) => false);
 final strAudioFileLanguageProvider = StateProvider<String>((ref) => '');
-final audioListProvider =
-    StateNotifierProvider<AudioListNotifier, List<AudioModel>>(
+final audioListProvider = StateNotifierProvider<AudioListNotifier, List<AudioModel>>(
   (ref) => AudioListNotifier(),
 );
 
 class AudioListNotifier extends StateNotifier<List<AudioModel>> {
   AudioListNotifier() : super([]) {
     loadAudioHistory();
+  }
+
+  Future<void> addChatMessage(int audioId, ChatMessage newMessage) async {
+    final audio = getAudioById(audioId);
+    if (audio == null) return;
+
+    final updatedChatList = <ChatMessage>[...(audio.chatList ?? []), newMessage];
+    final updatedAudio = audio.copyWith(chatList: updatedChatList);
+    await updateAudio(updatedAudio);
+  }
+
+  Future<void> updateMessageList(int audioId, List<ChatMessage> newMessage) async {
+    final audio = getAudioById(audioId);
+    if (audio == null) return;
+
+    final updatedAudio = audio.copyWith(chatList: newMessage);
+    await deleteAudio(audioId);
+    await addAudio(updatedAudio);
+  }
+
+  Future<void> updateChatMessage({
+    required int audioId,
+    required int index,
+    required ChatMessage updatedMessage,
+  }) async {
+    final audio = getAudioById(audioId);
+    if (audio == null || audio.chatList == null || index >= audio.chatList!.length) return;
+
+    final chatList = <ChatMessage>[...(audio.chatList ?? [])];
+    chatList[index] = updatedMessage;
+
+    final updatedAudio = audio.copyWith(chatList: chatList);
+    await updateAudio(updatedAudio);
+  }
+
+  Future<void> deleteChatMessage({
+    required int audioId,
+    required int index,
+  }) async {
+    final audio = getAudioById(audioId);
+    if (audio == null || audio.chatList == null || index >= audio.chatList!.length) return;
+
+    final chatList = <ChatMessage>[...audio.chatList!]..removeAt(index);
+    final updatedAudio = audio.copyWith(chatList: chatList);
+    await updateAudio(updatedAudio);
   }
 
   void loadAudioHistory() {
@@ -29,11 +78,36 @@ class AudioListNotifier extends StateNotifier<List<AudioModel>> {
     }
   }
 
+  Future<void> updateAudio(AudioModel updatedAudioModel) async {
+    state = [
+      for (final audio in state)
+        if (audio.id == updatedAudioModel.id) updatedAudioModel else audio,
+    ];
+    final audioHistory = UserAudioHistory()..audioList = state;
+    final audioBox = Boxes.getAudio();
+    await audioBox.put(Keys.keyAudioID, audioHistory);
+  }
+
   Future<void> addAudio(AudioModel audioModel) async {
     state = [...state, audioModel];
     final audioHistory = UserAudioHistory()..audioList = state;
     final audioBox = Boxes.getAudio();
     await audioBox.put(Keys.keyAudioID, audioHistory);
+  }
+
+  Future<void> deleteAudio(int audioId) async {
+    state = state.where((audio) => audio.id != audioId).toList();
+    final audioHistory = UserAudioHistory()..audioList = state;
+    final audioBox = Boxes.getAudio();
+    await audioBox.put(Keys.keyAudioID, audioHistory);
+  }
+
+  AudioModel? getAudioById(int audioId) {
+    try {
+      return state.firstWhere((audio) => audio.id == audioId);
+    } catch (e) {
+      return null;
+    }
   }
 
   Future<void> clearAudioHistory() async {
@@ -71,18 +145,7 @@ class AudioListNotifier extends StateNotifier<List<AudioModel>> {
       );
 
       if (result != null) {
-        final pickedFilePath = result.files.single.path ?? '';
-        final fileName = result.files.single.name;
-
-        // Get the app's temporary directory
-        final tempDir = await getTemporaryDirectory();
-        final targetPath = '${tempDir.path}/$fileName';
-
-        // Move the file to the temporary directory
-        final pickedFile = File(pickedFilePath);
-        final movedFile = await pickedFile.copy(targetPath);
-
-        final path = movedFile.path;
+        final path = result.files.single.path ?? '';
         final file = File(path);
         double fileSizeMB = file.lengthSync() / (1024 * 1024);
 
@@ -92,7 +155,7 @@ class AudioListNotifier extends StateNotifier<List<AudioModel>> {
         }
 
         ref.read(isAudioLoadingProvider.notifier).state = true;
-        final languageCode = ref.watch(strAudioFileLanguageProvider);
+        final languageCode = ref.read(strAudioFileLanguageProvider);
 
         Responsemodel? responsemodel = await ApiService.speechToTextDG(
           path,
@@ -101,34 +164,15 @@ class AudioListNotifier extends StateNotifier<List<AudioModel>> {
         );
 
         ref.read(isAudioLoadingProvider.notifier).state = false;
-        debugPrint((responsemodel?.paragraphs.transcript == "").toString());
-        if (responsemodel?.paragraphs.transcript == "" ||
-            responsemodel == null) {
+        if (responsemodel?.paragraphs.transcript.removeWhiteSpace == "" || responsemodel == null) {
           Utils.errorFeedbackDialog(context);
           return;
         }
-        // responsemodel ??= Responsemodel(
-        //     paragraphs: Paragraphs(
-        //   transcript: Strings.strNoResultFound,
-        // ));
+
         final user = ref.read(userProvider.notifier).state.getUser;
 
-        //Add in database
         Utils.addUser(intAudio: (user.intAudio ?? 0) + 1);
 
-        //Ask review
-        if (user.intAudio == 0) {
-          Future.delayed(const Duration(seconds: 2), () {
-            // if (mounted) Utils.reviewDialog(context);
-            Utils.openReviewDialog();
-          });
-        } else if (user.intAudio == 2 ||
-            user.intAudio == 4 ||
-            user.intAudio == 6 ||
-            user.intAudio == 8 ||
-            user.intAudio == 13) {
-          if (mounted) Utils.reviewDialog(context);
-        }
         String filename = basename(path);
         final audioModel = AudioModel(
           id: DateTime.now().millisecondsSinceEpoch,
@@ -139,7 +183,23 @@ class AudioListNotifier extends StateNotifier<List<AudioModel>> {
         );
 
         await addAudio(audioModel);
-        Utils.sendAnalyticsEvent(Keys.strAnlAudioDone);
+        if ([2, 4, 6, 8, 13].contains(user.intAudio)) {
+          Utils.reviewDialog(context).then((_) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AudioDetail(audioModel: audioModel),
+              ),
+            );
+          });
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AudioDetail(audioModel: audioModel),
+            ),
+          );
+        }
       }
     } catch (e) {
       ref.read(isAudioLoadingProvider.notifier).state = false;

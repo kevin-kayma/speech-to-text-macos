@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -8,14 +7,12 @@ import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:transcribe/config/config.dart';
+import 'package:transcribe/config/session.dart';
 
-import 'package:http/http.dart' as http;
-import 'package:http/io_client.dart';
 import 'package:transcribe/models/models.dart';
 import 'package:transcribe/pages/pages.dart';
-import 'package:transcribe/providers/providers.dart';
 
-enum CanAccess { query, image, audio, recordaudio }
+enum CanAccess { query, image, audio, recordaudio, chatbot, summary }
 
 class Utils {
   Utils._();
@@ -28,7 +25,7 @@ class Utils {
       centerTitle: true,
       actions: [
         IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.close,
             color: AppTheme.greyFontColor,
           ),
@@ -40,10 +37,7 @@ class Utils {
       title: Text(
         title,
         maxLines: 2,
-        style: TextStyle(
-            fontSize: Sizes.mediumFont,
-            fontWeight: FontWeight.bold,
-            color: AppTheme.lightFontColor),
+        style: TextStyle(fontSize: Sizes.mediumFont, fontWeight: FontWeight.bold, color: AppTheme.lightFontColor),
       ),
     );
   }
@@ -63,20 +57,21 @@ class Utils {
   }
 
   //User info methods
-  static addUser(
-      {int? intQueries,
-      int? intImages,
-      int? intAudio,
-      int? intRecordAudio,
-      int? intChatReview,
-      int? intImageReview,
-      int? intShare,
-      int? intCopy,
-      int? intImageQuantity,
-      String? strImageSize,
-      bool? isDismissImageSetting,
-      bool? isIntroLoaded,
-      String? strAlertID}) {
+  static addUser({
+    int? intQueries,
+    int? intImages,
+    int? intAudio,
+    int? intRecordAudio,
+    int? intChatReview,
+    int? intImageReview,
+    int? intShare,
+    int? intCopy,
+    int? intImageQuantity,
+    String? strImageSize,
+    bool? isDismissImageSetting,
+    bool? isIntroLoaded,
+    String? strAlertID,
+  }) {
     final user = Boxes.getUser();
     final myuser = user.get(Keys.keyUserID);
 
@@ -108,8 +103,7 @@ class Utils {
         ..intShare = intShare ?? myuser.intShare
         ..intCopy = intCopy ?? myuser.intCopy
         ..intImageQuantity = intImageQuantity ?? myuser.intImageQuantity
-        ..isDismissImageSetting =
-            isDismissImageSetting ?? myuser.isDismissImageSetting
+        ..isDismissImageSetting = isDismissImageSetting ?? myuser.isDismissImageSetting
         ..isIntroLoaded = isIntroLoaded ?? myuser.isIntroLoaded
         ..strImageSize = strImageSize ?? myuser.strImageSize
         ..strAlertID = strAlertID ?? myuser.strAlertID;
@@ -131,8 +125,7 @@ class Utils {
       if (await Purchases.isConfigured) {
         CustomerInfo customerInfo = await Purchases.getCustomerInfo();
         (customerInfo.entitlements.all[entitlementID] != null &&
-                (customerInfo.entitlements.all[entitlementID]?.isActive ??
-                    false))
+                (customerInfo.entitlements.all[entitlementID]?.isActive ?? false))
             ? isUserSubscribed = true
             : isUserSubscribed = false;
       } else {
@@ -147,38 +140,30 @@ class Utils {
       if (offerings.current != null) {
         offerings.current?.availablePackages.forEach((element) async {
           final identifier = element.storeProduct.identifier;
-          final introEligibility =
-              await Purchases.checkTrialOrIntroductoryPriceEligibility(
+          final introEligibility = await Purchases.checkTrialOrIntroductoryPriceEligibility(
             [identifier],
           );
 
           final status = introEligibility[identifier]?.status;
           switch (status) {
             case IntroEligibilityStatus.introEligibilityStatusEligible:
-              debugPrint(IntroEligibilityStatus.introEligibilityStatusEligible
-                  .toString());
+              debugPrint(IntroEligibilityStatus.introEligibilityStatusEligible.toString());
               break;
             // showToast('introEligibilityStatusEligible');
 
             case IntroEligibilityStatus.introEligibilityStatusIneligible:
-              debugPrint(IntroEligibilityStatus.introEligibilityStatusEligible
-                  .toString());
+              debugPrint(IntroEligibilityStatus.introEligibilityStatusEligible.toString());
               break;
-            case IntroEligibilityStatus
-                  .introEligibilityStatusNoIntroOfferExists:
-              debugPrint(IntroEligibilityStatus
-                  .introEligibilityStatusNoIntroOfferExists
-                  .toString());
+            case IntroEligibilityStatus.introEligibilityStatusNoIntroOfferExists:
+              debugPrint(IntroEligibilityStatus.introEligibilityStatusNoIntroOfferExists.toString());
               break;
 
             case IntroEligibilityStatus.introEligibilityStatusUnknown:
-              debugPrint(IntroEligibilityStatus.introEligibilityStatusUnknown
-                  .toString());
+              debugPrint(IntroEligibilityStatus.introEligibilityStatusUnknown.toString());
               break;
 
             default:
-              debugPrint(IntroEligibilityStatus.introEligibilityStatusUnknown
-                  .toString());
+              debugPrint(IntroEligibilityStatus.introEligibilityStatusUnknown.toString());
               break;
           }
         });
@@ -194,7 +179,9 @@ class Utils {
     final user = Boxes.getUser();
     final userInfo = user.get(Keys.keyUserID);
     final isNotPremium = !isUserSubscribed;
-
+    if (kDebugMode) {
+      return true;
+    }
     switch (canAccess) {
       case CanAccess.audio:
         if (userInfo != null) {
@@ -208,8 +195,7 @@ class Utils {
         }
       case CanAccess.recordaudio:
         if (userInfo != null) {
-          if (isNotPremium &&
-              (userInfo.intRecordAudio ?? 0) >= intMaxRecordAudio) {
+          if (isNotPremium && (userInfo.intRecordAudio ?? 0) >= intMaxRecordAudio) {
             return false;
           } else {
             return true;
@@ -217,8 +203,22 @@ class Utils {
         } else {
           return true;
         }
-      default:
+      case CanAccess.query:
         return true;
+      case CanAccess.image:
+        return true;
+      case CanAccess.chatbot:
+        if (isNotPremium && Session.chatCount >= maxChatCount) {
+          return false;
+        } else {
+          return true;
+        }
+      case CanAccess.summary:
+        if (isNotPremium && Session.summaryCount >= maxSummaryCount) {
+          return false;
+        } else {
+          return true;
+        }
     }
   }
 
@@ -239,8 +239,7 @@ class Utils {
   }
 
 //Google Analytics
-  static Future<void> sendAnalyticsEvent(String eventName,
-      [Map<String, Object>? eventValue]) async {
+  static Future<void> sendAnalyticsEvent(String eventName, [Map<String, Object>? eventValue]) async {
     if (!kDebugMode) {
       // FirebaseAnalytics analytics = FirebaseAnalytics.instance;
       // await analytics.logEvent(
@@ -284,18 +283,14 @@ class Utils {
                   Strings.strContactDev,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      fontSize: Sizes.mediumFont,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.lightFontColor),
+                      fontSize: Sizes.mediumFont, fontWeight: FontWeight.bold, color: AppTheme.lightFontColor),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   Strings.strContactDevMsg,
                   textAlign: TextAlign.center,
                   maxLines: 6,
-                  style: TextStyle(
-                      fontSize: Sizes.mediumFont,
-                      color: AppTheme.greyFontColor),
+                  style: TextStyle(fontSize: Sizes.mediumFont, color: AppTheme.greyFontColor),
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 12),
@@ -307,25 +302,23 @@ class Utils {
                         Navigator.pop(context);
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => const FeedbackView()),
+                          MaterialPageRoute(builder: (context) => const FeedbackView()),
                         );
                       },
                       child: Text(
                         Strings.strSend.toUpperCase(),
-                        style: TextStyle(color: AppTheme.darkFontColor),
+                        style: const TextStyle(color: AppTheme.darkFontColor),
                       ),
                     ),
                     const SizedBox(width: 12),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme
-                            .greyBackgroundColor, // Set the background color here
+                        backgroundColor: AppTheme.greyBackgroundColor, // Set the background color here
                       ),
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: Text(
+                      child: const Text(
                         'CLOSE',
                         style: TextStyle(color: AppTheme.lightFontColor),
                       ),
@@ -364,18 +357,14 @@ class Utils {
                   Strings.strNoNetwork,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      fontSize: Sizes.mediumFont,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.lightFontColor),
+                      fontSize: Sizes.mediumFont, fontWeight: FontWeight.bold, color: AppTheme.lightFontColor),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   Strings.strNoInternetConnectionMessage,
                   textAlign: TextAlign.center,
                   maxLines: 6,
-                  style: TextStyle(
-                      fontSize: Sizes.mediumFont,
-                      color: AppTheme.greyFontColor),
+                  style: TextStyle(fontSize: Sizes.mediumFont, color: AppTheme.greyFontColor),
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 12),
@@ -383,7 +372,7 @@ class Utils {
                   onPressed: onRetry,
                   child: Text(
                     Strings.strRetry.toUpperCase(),
-                    style: TextStyle(color: AppTheme.darkFontColor),
+                    style: const TextStyle(color: AppTheme.darkFontColor),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -437,9 +426,7 @@ class Utils {
                         initAlertData.title ?? "",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontSize: Sizes.mediumFont,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.lightFontColor),
+                            fontSize: Sizes.mediumFont, fontWeight: FontWeight.bold, color: AppTheme.lightFontColor),
                       )
                     : AppBar(
                         elevation: 0,
@@ -449,14 +436,13 @@ class Utils {
                         foregroundColor: AppTheme.lightFontColor,
                         actions: [
                           IconButton(
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.close,
                               color: AppTheme.greyFontColor,
                             ),
                             onPressed: () {
                               Utils.addUser(strAlertID: initAlertData.alertID);
-                              if (initAlertData.isForcefullyUpdate !=
-                                  Keys.keyTrue) {
+                              if (initAlertData.isForcefullyUpdate != Keys.keyTrue) {
                                 Navigator.pop(context);
                               }
                             },
@@ -465,9 +451,7 @@ class Utils {
                         title: Text(
                           initAlertData.title ?? "",
                           maxLines: 2,
-                          style: TextStyle(
-                              fontSize: Sizes.mediumFont,
-                              fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: Sizes.mediumFont, fontWeight: FontWeight.bold),
                         ),
                       ),
                 const SizedBox(height: 12),
@@ -475,9 +459,7 @@ class Utils {
                   initAlertData.desc ?? '',
                   textAlign: TextAlign.center,
                   maxLines: 10,
-                  style: TextStyle(
-                      fontSize: Sizes.mediumFont,
-                      color: AppTheme.greyFontColor),
+                  style: TextStyle(fontSize: Sizes.mediumFont, color: AppTheme.greyFontColor),
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 12),
@@ -488,13 +470,11 @@ class Utils {
                     if (initAlertData.msgAction == Keys.keyAppUpdate) {
                       if (Platform.isAndroid) {
                         OpenStore.instance.open(
-                          androidAppBundleId:
-                              strPlayStoreID, // Android app bundle package name
+                          androidAppBundleId: strPlayStoreID, // Android app bundle package name
                         );
                       } else {
                         OpenStore.instance.open(
-                          appStoreId:
-                              strAppStoreID, // AppStore id of your app for iOS
+                          appStoreId: strAppStoreID, // AppStore id of your app for iOS
                         );
                       }
                     }
@@ -504,7 +484,7 @@ class Utils {
                   },
                   child: Text(
                     initAlertData.msgActionButtonTitle?.toUpperCase() ?? '',
-                    style: TextStyle(color: AppTheme.darkFontColor),
+                    style: const TextStyle(color: AppTheme.darkFontColor),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -519,6 +499,9 @@ class Utils {
   }
 
   static Future<void> reviewDialog(BuildContext context) async {
+    if (kDebugMode) {
+      return;
+    }
     Future<void> future = showModalBottomSheet<void>(
       isDismissible: false,
       enableDrag: false,
@@ -548,20 +531,18 @@ class Utils {
                   Strings.strReviewSubTitle,
                   textAlign: TextAlign.center,
                   maxLines: 6,
-                  style: TextStyle(
-                      fontSize: Sizes.mediumFont,
-                      color: AppTheme.greyFontColor),
+                  style: TextStyle(fontSize: Sizes.mediumFont, color: AppTheme.greyFontColor),
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 12),
                 ElevatedButton(
                   onPressed: () {
-                    Utils.sendAnalyticsEvent(Keys.strAnlHelpUsReview);
+                    Utils.sendAnalyticsEvent(AnalyticsEvents.helpUsReview);
                     Navigator.pop(context);
                     Utils.openReviewDialog();
-                    // Utils.openStoreReview();// TODO:
+                    // Utils.openStoreReview();
                   },
-                  child: Text(
+                  child: const Text(
                     Strings.strHelp,
                     style: TextStyle(color: AppTheme.darkFontColor),
                   ),
@@ -599,18 +580,14 @@ class Utils {
                   strTitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      fontSize: Sizes.mediumFont,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.lightFontColor),
+                      fontSize: Sizes.mediumFont, fontWeight: FontWeight.bold, color: AppTheme.lightFontColor),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   strSubTitle,
                   textAlign: TextAlign.center,
                   maxLines: 6,
-                  style: TextStyle(
-                      fontSize: Sizes.mediumFont,
-                      color: AppTheme.greyFontColor),
+                  style: TextStyle(fontSize: Sizes.mediumFont, color: AppTheme.greyFontColor),
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 12),
@@ -623,9 +600,9 @@ class Utils {
                         backgroundColor: AppTheme.greyBackgroundColor,
                       ),
                       onPressed: onNo,
-                      child: Text(
+                      child: const Text(
                         Strings.strNo,
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
                     const SizedBox(
@@ -633,7 +610,7 @@ class Utils {
                     ),
                     ElevatedButton(
                       onPressed: onYes,
-                      child: Text(
+                      child: const Text(
                         Strings.strYes,
                         style: TextStyle(color: AppTheme.darkFontColor),
                       ),
@@ -752,8 +729,7 @@ class Utils {
     }
   }
 
-  static Future<void> sendErrorToSlack(String errorMessage,
-      {String? statusCode = 'Nil'}) async {
+  static Future<void> sendErrorToSlack(String errorMessage, {String? statusCode = 'Nil'}) async {
     try {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       String version = packageInfo.version;
@@ -801,8 +777,7 @@ class Utils {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String version = packageInfo.version;
 
-    inReview = initAlertData.isUpdated == Keys.keyTrue &&
-        version == initAlertData.appVersion;
+    inReview = initAlertData.isUpdated == Keys.keyTrue && version == initAlertData.appVersion;
     debugPrint(inReview.toString());
   }
 

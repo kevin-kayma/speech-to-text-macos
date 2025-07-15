@@ -6,7 +6,6 @@ import 'package:transcribe/pages/pages.dart';
 Widget audioCard(BuildContext context, AudioModel audioModel) {
   return ClickableCard(
     onTap: () {
-      Utils.sendAnalyticsEvent(Keys.strAnlAudioChecked);
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -20,10 +19,8 @@ Widget audioCard(BuildContext context, AudioModel audioModel) {
         child: Text(
           audioModel.filename,
           maxLines: 2,
-          style: TextStyle(
-              overflow: TextOverflow.ellipsis,
-              fontWeight: FontWeight.w400,
-              color: AppTheme.lightFontColor),
+          style:
+              TextStyle(overflow: TextOverflow.ellipsis, fontWeight: FontWeight.w400, color: AppTheme.lightFontColor),
         ),
       ),
       subtitle: Column(
@@ -32,12 +29,9 @@ Widget audioCard(BuildContext context, AudioModel audioModel) {
         spacing: 8,
         children: [
           Text(
-            audioModel.responseModel?.paragraphs.transcript ??
-                Strings.strNoResultFound,
-            style: TextStyle(
-                overflow: TextOverflow.ellipsis,
-                color: AppTheme.greyFontColor,
-                fontWeight: FontWeight.w300),
+            audioModel.responseModel?.paragraphs.transcript ?? Strings.strNoResultFound,
+            style:
+                TextStyle(overflow: TextOverflow.ellipsis, color: AppTheme.greyFontColor, fontWeight: FontWeight.w300),
             maxLines: 3,
           ),
           Text(

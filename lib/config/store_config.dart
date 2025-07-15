@@ -30,11 +30,9 @@ class StoreConfig {
     //Configure Store
     PurchasesConfiguration configuration;
     if (Platform.isIOS || Platform.isMacOS) {
-      configuration = PurchasesConfiguration(appleApiKey)
-        ..store = Store.appStore;
+      configuration = PurchasesConfiguration(appleApiKey)..store = Store.appStore;
     } else {
-      configuration = PurchasesConfiguration(googleApiKey)
-        ..store = Store.playStore;
+      configuration = PurchasesConfiguration(googleApiKey)..store = Store.playStore;
     }
 
     await Purchases.configure(configuration);
@@ -49,7 +47,6 @@ class StoreConfig {
     (subscription active) and if not, display the paywall.
   */
   static showSubscription(BuildContext context) async {
-    Utils.sendAnalyticsEvent(Keys.strAnlSubscription);
     bool isConnection = await Utils.checkInternet();
     if (isConnection) {
       await Utils.refreshSubscription();
@@ -69,8 +66,7 @@ class StoreConfig {
               useSafeArea: true,
               context: context,
               builder: (BuildContext context) {
-                return StatefulBuilder(
-                    builder: (BuildContext context, StateSetter setModalState) {
+                return StatefulBuilder(builder: (BuildContext context, StateSetter setModalState) {
                   return Subscription(
                     offering: offerings.current!,
                   );

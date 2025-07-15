@@ -3,70 +3,37 @@ import 'package:transcribe/config/config.dart';
 class AppTheme {
   AppTheme._();
 
-  static Color staticBlackColor = const Color(0xff000000);
-  static Color scaffoldBackgroundColor = const Color(0xff0F0F0F);
-  static Color greyBackgroundColor = const Color(0xff1E1E1E);
-  static Color darkFontColor = const Color(0xff212121);
-  static Color greyFontColor = const Color(0XFF9E9E9E);
-  static Color lightFontColor = const Color(0xffDFE0E2);
-  static Color subtitleColor = const Color(0xffDFE0E2);
-  static Color primaryColor = const Color(0xffA294F9);
-  static Color lightPrimaryColor = const Color(0xffCDC1FF);
-  static Color audioCardColor = const Color(0xff222831);
-  static Color cardBackgroundColor = const Color(0xff222831);
-  static Color textFieldHintColor = const Color(0xff8E8A8A);
-  static Color textFieldBorderColor = const Color(0xff645E5E);
-  static Color textFieldBackgroundColor = const Color(0xff141414);
-  static Color errorColor = const Color(0xffE57373);
-  static Color sidebarBackgroundColor = const Color(0xff222831);
+  static const Color staticBlackColor = const Color(0xff000000);
+  static const Color scaffoldBackgroundColor = const Color(0xff0F0F0F);
+  static const Color greyBackgroundColor = const Color(0xff1E1E1E);
+  static const Color darkFontColor = const Color(0xff212121);
+  static const Color greyFontColor = const Color(0XFF9E9E9E);
+  static const Color lightFontColor = const Color(0xffDFE0E2);
+  static const Color subtitleColor = const Color(0xffDFE0E2);
+  static const Color primaryColor = const Color(0xffA294F9);
+  static const Color lightPrimaryColor = const Color(0xffCDC1FF);
+  static const Color audioCardColor = const Color(0xff222831);
+  static const Color cardBackgroundColor = const Color(0xff222831);
+  static const Color textFieldHintColor = const Color(0xff8E8A8A);
+  static const Color textFieldBorderColor = const Color(0xff645E5E);
+  static const Color textFieldBackgroundColor = const Color(0xff141414);
+  static const Color errorColor = const Color(0xffE57373);
+  static const Color sidebarBackgroundColor = const Color(0xff222831);
 
   static final MacosThemeData darkTheme = MacosThemeData.dark().copyWith(
     primaryColor: AppTheme.primaryColor,
     typography: MacosTypography(
-      body: TextStyle(
-          fontFamily: fontFamily,
-          color: AppTheme.lightFontColor,
-          fontWeight: FontWeight.w400),
-      title1: TextStyle(
-          fontFamily: fontFamily,
-          color: AppTheme.lightFontColor,
-          fontWeight: FontWeight.w400),
-      title2: TextStyle(
-          fontFamily: fontFamily,
-          color: AppTheme.lightFontColor,
-          fontWeight: FontWeight.w400),
-      title3: TextStyle(
-          fontFamily: fontFamily,
-          color: AppTheme.lightFontColor,
-          fontWeight: FontWeight.w400),
-      callout: TextStyle(
-          fontFamily: fontFamily,
-          color: AppTheme.lightFontColor,
-          fontWeight: FontWeight.w400),
-      caption1: TextStyle(
-          fontFamily: fontFamily,
-          color: AppTheme.lightFontColor,
-          fontWeight: FontWeight.w400),
-      caption2: TextStyle(
-          fontFamily: fontFamily,
-          color: AppTheme.lightFontColor,
-          fontWeight: FontWeight.w400),
-      footnote: TextStyle(
-          fontFamily: fontFamily,
-          color: AppTheme.lightFontColor,
-          fontWeight: FontWeight.w400),
-      headline: TextStyle(
-          fontFamily: fontFamily,
-          color: AppTheme.lightFontColor,
-          fontWeight: FontWeight.w400),
-      subheadline: TextStyle(
-          fontFamily: fontFamily,
-          color: AppTheme.lightFontColor,
-          fontWeight: FontWeight.w400),
-      largeTitle: TextStyle(
-          fontFamily: fontFamily,
-          color: AppTheme.lightFontColor,
-          fontWeight: FontWeight.w400),
+      body: TextStyle(fontFamily: fontFamily, color: AppTheme.lightFontColor, fontWeight: FontWeight.w400),
+      title1: TextStyle(fontFamily: fontFamily, color: AppTheme.lightFontColor, fontWeight: FontWeight.w400),
+      title2: TextStyle(fontFamily: fontFamily, color: AppTheme.lightFontColor, fontWeight: FontWeight.w400),
+      title3: TextStyle(fontFamily: fontFamily, color: AppTheme.lightFontColor, fontWeight: FontWeight.w400),
+      callout: TextStyle(fontFamily: fontFamily, color: AppTheme.lightFontColor, fontWeight: FontWeight.w400),
+      caption1: TextStyle(fontFamily: fontFamily, color: AppTheme.lightFontColor, fontWeight: FontWeight.w400),
+      caption2: TextStyle(fontFamily: fontFamily, color: AppTheme.lightFontColor, fontWeight: FontWeight.w400),
+      footnote: TextStyle(fontFamily: fontFamily, color: AppTheme.lightFontColor, fontWeight: FontWeight.w400),
+      headline: TextStyle(fontFamily: fontFamily, color: AppTheme.lightFontColor, fontWeight: FontWeight.w400),
+      subheadline: TextStyle(fontFamily: fontFamily, color: AppTheme.lightFontColor, fontWeight: FontWeight.w400),
+      largeTitle: TextStyle(fontFamily: fontFamily, color: AppTheme.lightFontColor, fontWeight: FontWeight.w400),
       color: AppTheme.lightFontColor,
     ),
     accentColor: AccentColor.purple,

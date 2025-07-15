@@ -22,13 +22,15 @@ class AudioModelAdapter extends TypeAdapter<AudioModel> {
       filePath: fields[2] as String,
       date: fields[3] as String,
       responseModel: fields[4] as Responsemodel?,
+      summary: fields[5] as String?,
+      chatList: (fields[6] as List?)?.cast<ChatMessage>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, AudioModel obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -38,7 +40,11 @@ class AudioModelAdapter extends TypeAdapter<AudioModel> {
       ..writeByte(3)
       ..write(obj.date)
       ..writeByte(4)
-      ..write(obj.responseModel);
+      ..write(obj.responseModel)
+      ..writeByte(5)
+      ..write(obj.summary)
+      ..writeByte(6)
+      ..write(obj.chatList);
   }
 
   @override

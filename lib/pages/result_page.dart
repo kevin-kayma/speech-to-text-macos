@@ -17,23 +17,28 @@ import 'package:transcribe/models/paragraphs.dart';
 import 'package:transcribe/models/responsemodel.dart';
 import 'package:transcribe/models/sentence.dart';
 import 'package:transcribe/pages/chat_screen.dart';
-import 'package:transcribe/pages/edit_name.dart';
 import 'package:transcribe/pages/summary_page.dart';
 import 'package:transcribe/providers/audio_provider.dart';
 
-class AudioDetail extends ConsumerStatefulWidget {
-  final AudioModel audioModel;
-  const AudioDetail({super.key, required this.audioModel});
+class ResultWidget extends ConsumerStatefulWidget {
+  const ResultWidget({
+    required this.responsemodel,
+    required this.audioPath,
+    super.key,
+  });
+
+  final Responsemodel responsemodel;
+  final String audioPath;
 
   @override
-  ConsumerState<AudioDetail> createState() => _AudioDetailState();
+  ConsumerState<ResultWidget> createState() => _ResultWidgetState();
 }
 
-class _AudioDetailState extends ConsumerState<AudioDetail> {
+class _ResultWidgetState extends ConsumerState<ResultWidget> {
   final player.AudioPlayer globalAudioPlayer = player.AudioPlayer();
   final player.AudioPlayer paragraphAudioPlayer = player.AudioPlayer();
   AudioModel audioModel = AudioModel(
-    id: 1,
+    id: -1,
     filename: 'filename',
     filePath: 'filePath',
     date: 'date',
@@ -51,14 +56,20 @@ class _AudioDetailState extends ConsumerState<AudioDetail> {
 
   Map<int, bool> isParagraphPlaying = {};
 
-  void updateModel() {
-    audioModel = widget.audioModel;
-    setState(() {});
-  }
-
   @override
   void initState() {
     super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      await Future.delayed(Durations.medium4);
+      audioModel = AudioModel(
+        id: tempAudioId,
+        filename: '',
+        filePath: widget.audioPath,
+        date: Utils.getCurrentDateAndTime(),
+        responseModel: widget.responsemodel,
+      );
+      setState(() {});
+    });
     globalAudioPlayer.onPlayerComplete.listen((event) {
       setState(() {
         isGlobalPlaying = false;
@@ -71,14 +82,10 @@ class _AudioDetailState extends ConsumerState<AudioDetail> {
       });
     });
 
-    // Paragraph audio player listeners
     paragraphAudioPlayer.onPlayerComplete.listen((event) {
       setState(() {
         isParagraphPlaying.clear(); // Stop all paragraph playback when complete
       });
-    });
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      updateModel();
     });
   }
 
@@ -89,7 +96,7 @@ class _AudioDetailState extends ConsumerState<AudioDetail> {
     super.dispose();
   }
 
-  void editParagraphTranscription(String summaryText, Paragraph paragraph, int index) {
+  void editSummary(String summaryText, Paragraph paragraph, int index) {
     TextEditingController controller = TextEditingController(text: summaryText);
     showDialog(
       context: context,
@@ -118,20 +125,20 @@ class _AudioDetailState extends ConsumerState<AudioDetail> {
                 const Text(
                   'Edit Transcription',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: AppTheme.primaryColor,
                   ),
-                ),
+                ).paddingOnly(left: 10),
                 const SizedBox(height: 15),
                 Expanded(
                   child: TextFormField(
                     controller: controller,
                     maxLines: 100,
-                    style: const TextStyle(color: AppTheme.lightFontColor),
                     onTapOutside: (event) {
                       FocusScope.of(context).unfocus();
                     },
+                    style: const TextStyle(color: AppTheme.lightFontColor),
                     validator: (value) {
                       if (value == null || value.isEmpty || value.length < 3) {
                         return 'Enter the valid value';
@@ -140,7 +147,7 @@ class _AudioDetailState extends ConsumerState<AudioDetail> {
                       }
                     },
                     decoration: InputDecoration(
-                      hintText: 'Edit your Transcription here...',
+                      hintText: 'Edit your summary here...',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
                         borderSide: BorderSide.none,
@@ -376,7 +383,7 @@ class _AudioDetailState extends ConsumerState<AudioDetail> {
                                   ),
                                   onPressed: () {
                                     Utils.sendAnalyticsEvent(AnalyticsEvents.editParagraph);
-                                    editParagraphTranscription(
+                                    editSummary(
                                       paragraph.sentences.map((sentence) => sentence.text).join(' '),
                                       paragraph,
                                       paragraphIndex,
@@ -474,386 +481,263 @@ class _AudioDetailState extends ConsumerState<AudioDetail> {
   @override
   Widget build(BuildContext context) {
     final homeWatch = ref.watch(homeController);
-    return Scaffold(
-      backgroundColor: AppTheme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: AppTheme.scaffoldBackgroundColor,
-        foregroundColor: AppTheme.lightFontColor,
-        title: Text(audioModel.filename),
-        automaticallyImplyLeading: !homeWatch.isSummaryGenerating,
-        actions: !homeWatch.isSummaryGenerating
-            ? [
-                PopupMenuButton<String>(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 8,
-                  color: AppTheme.scaffoldBackgroundColor,
-                  constraints: const BoxConstraints(maxWidth: 200),
-                  child: const Icon(Icons.more_vert, color: AppTheme.lightFontColor, size: 24)
-                      .paddingSymmetric(horizontal: 10),
-                  itemBuilder: (BuildContext context) {
-                    return [
-                      const PopupMenuItem<String>(
-                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-                        value: 'rename',
-                        child: Row(
-                          children: [
-                            Icon(HugeIcons.strokeRoundedEdit02, size: 16, color: AppTheme.lightFontColor),
-                            SizedBox(width: 8),
-                            Text('Rename', style: TextStyle(fontSize: 14, color: AppTheme.lightFontColor)),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem<String>(
-                        value: 'edit_transcription',
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-                        child: Row(
-                          children: [
-                            Icon(HugeIcons.strokeRoundedBookEdit, size: 20, color: AppTheme.lightFontColor),
-                            SizedBox(width: 8),
-                            Text('Edit Transcription', style: TextStyle(fontSize: 14, color: AppTheme.lightFontColor)),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem<String>(
-                        value: 'delete_transcription',
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-                        child: Row(
-                          children: [
-                            Icon(HugeIcons.strokeRoundedDelete01, size: 20, color: AppTheme.lightFontColor),
-                            SizedBox(width: 8),
-                            Text('Delete Transcription',
-                                style: TextStyle(fontSize: 14, color: AppTheme.lightFontColor)),
-                          ],
-                        ),
-                      ),
-                    ];
-                  },
-                  onSelected: (String value) async {
-                    if (value == 'rename') {
-                      Utils.sendAnalyticsEvent(AnalyticsEvents.editName);
-                      final updatedModel = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EditScreen(
-                            model: audioModel,
-                            isChangeName: true,
-                          ),
-                        ),
-                      );
-                      if (updatedModel is AudioModel) {
-                        audioModel = updatedModel;
-                        setState(() {});
-                      }
-                    } else if (value == 'edit_transcription') {
-                      Utils.sendAnalyticsEvent(AnalyticsEvents.editTranscription);
-                      final updatedModel = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EditScreen(
-                            model: audioModel,
-                          ),
-                        ),
-                      );
-                      if (updatedModel is AudioModel) {
-                        audioModel = updatedModel;
-                        setState(() {});
-                      }
-                    } else if (value == 'delete_transcription') {
-                      showDeleteConfirmationDialog(context, audioModel);
-                    }
-                  },
-                ),
-              ]
-            : [],
-      ),
-      body: SafeArea(
-        child: Stack(
+    return Stack(
+      children: [
+        Column(
           children: [
-            Column(
+            Expanded(child: _buildTranscriptionTimeline()),
+            const SizedBox(height: 12),
+            Row(
               children: [
-                Expanded(child: _buildTranscriptionTimeline()),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () async {
-                          Utils.sendAnalyticsEvent(AnalyticsEvents.summaryTap);
-                          if (audioModel.summary != null && (audioModel.summary?.isNotEmpty ?? false)) {
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      Utils.sendAnalyticsEvent(AnalyticsEvents.summaryTap);
+                      if (audioModel.summary != null && (audioModel.summary?.isNotEmpty ?? false)) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SummaryScreen(summaryText: audioModel.summary!),
+                          ),
+                        );
+                      } else {
+                        if (Utils.isCanAccess(CanAccess.summary)) {
+                          final summary = await homeWatch.generateSummary(
+                            context,
+                            audioModel.responseModel?.paragraphs.transcript ?? '',
+                          );
+                          if (summary.isNotEmpty) {
+                            final newModel = audioModel.copyWith(summary: summary);
+                            ref.read(audioListProvider.notifier).deleteAudio(newModel.id);
+                            ref.read(audioListProvider.notifier).addAudio(newModel);
+                            setState(() {
+                              audioModel = newModel;
+                            });
+                            await Future.delayed(Durations.medium1);
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => SummaryScreen(summaryText: audioModel.summary!),
+                                builder: (context) => SummaryScreen(
+                                  summaryText: summary,
+                                  isFirstTime: true,
+                                ),
                               ),
                             );
                           } else {
-                            if (Utils.isCanAccess(CanAccess.summary)) {
-                              final summary = await homeWatch.generateSummary(
-                                context,
-                                widget.audioModel.responseModel?.paragraphs.transcript ?? '',
-                              );
-                              if (summary.isNotEmpty) {
-                                final newModel = widget.audioModel.copyWith(summary: summary);
-                                ref.read(audioListProvider.notifier).deleteAudio(newModel.id);
-                                ref.read(audioListProvider.notifier).addAudio(newModel);
-                                setState(() {
-                                  audioModel = newModel;
-                                });
-                                await Future.delayed(Durations.medium1);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => SummaryScreen(
-                                      summaryText: summary,
-                                      isFirstTime: true,
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                showToast('Some error occured while generating summary');
-                              }
-                            } else {
-                              StoreConfig.showSubscription(context);
-                            }
+                            showToast('Some error occured while generating summary');
                           }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          backgroundColor: AppTheme.primaryColor,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        icon: const HugeIcon(
-                          icon: HugeIcons.strokeRoundedNote,
-                          color: AppTheme.darkFontColor,
-                        ),
-                        label: const Text(
-                          'Summary',
-                          style: TextStyle(color: AppTheme.darkFontColor),
-                        ),
+                        } else {
+                          StoreConfig.showSubscription(context);
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
+                      backgroundColor: AppTheme.primaryColor,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    const SizedBox(width: 20),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Utils.sendAnalyticsEvent(AnalyticsEvents.chatBotTap);
-                          final chatbotState = ref.read(chatbotProvider);
-                          chatbotState.chatHistory.clear();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ChatScreen(
-                                audioId: audioModel.id,
-                                transcript: audioModel.responseModel?.paragraphs.transcript ?? '',
-                              ),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        icon: const HugeIcon(
-                          icon: HugeIcons.strokeRoundedAiChat02,
-                          color: AppTheme.darkFontColor,
-                        ),
-                        label: const Text(
-                          'Ask Question',
-                          style: TextStyle(color: AppTheme.darkFontColor),
-                        ),
-                      ),
+                    icon: const HugeIcon(
+                      icon: HugeIcons.strokeRoundedNote,
+                      color: AppTheme.darkFontColor,
                     ),
-                  ],
-                ).paddingSymmetric(horizontal: context.width * 0.08),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    audioModel.responseModel?.paragraphs.paragraphs?.isNotEmpty ?? false
-                        ? Tooltip(
-                            message: 'Toggle Transcription',
-                            child: IconButton(
-                              splashColor: Colors.transparent,
-                              highlightColor: Colors.transparent,
-                              icon: Icon(
-                                showFullTranscription
-                                    ? LucideIcons.fileText400
-                                    : HugeIcons.strokeRoundedLeftToRightListDash,
-                                color: AppTheme.lightFontColor,
-                              ),
-                              onPressed: () {
-                                Utils.sendAnalyticsEvent(AnalyticsEvents.toggleTranscription);
-                                setState(
-                                  () {
-                                    showFullTranscription = !showFullTranscription;
-                                  },
-                                );
-                                //show Full transcription
-                              },
-                            ),
-                          )
-                        : const SizedBox(),
-                    Tooltip(
-                      message: 'Copy',
-                      child: IconButton(
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        icon: const HugeIcon(
-                          icon: HugeIcons.strokeRoundedCopy01,
-                          color: AppTheme.lightFontColor,
-                        ),
-                        onPressed: () {
-                          Utils.sendAnalyticsEvent(AnalyticsEvents.copyFull);
-                          Clipboard.setData(ClipboardData(
-                            text: audioModel.responseModel?.paragraphs.transcript ?? Strings.strNoResultFound,
-                          ));
-                          showToast('Copied', AppTheme.darkFontColor);
-                        },
-                      ),
+                    label: const Text(
+                      'Summary',
+                      style: TextStyle(color: AppTheme.darkFontColor),
                     ),
-                    Tooltip(
-                      message: 'Share',
-                      triggerMode: TooltipTriggerMode.longPress,
-                      child: IconButton(
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        icon: const HugeIcon(
-                          icon: HugeIcons.strokeRoundedShare01,
-                          color: AppTheme.lightFontColor,
-                        ),
-                        onPressed: () {
-                          Utils.sendAnalyticsEvent(AnalyticsEvents.shareFull);
-                          Share.share(
-                            '${audioModel.responseModel?.paragraphs.transcript ?? Strings.strNoResultFound} } Appstore: $strAppstoreLink',
-                          );
-                        },
-                      ),
-                    ),
-                    const Spacer(),
-                    FutureBuilder<String>(
-                      future: Utils.getFilepath(audioModel.filePath),
-                      builder: (context, snapshot) {
-                        return Visibility(
-                          visible: snapshot.data != '' && snapshot.data != null,
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 12.0),
-                            child: CircleAvatar(
-                              backgroundColor: AppTheme.primaryColor,
-                              radius: Sizes.radius,
-                              child: IconButton(
-                                onPressed: toggleGlobalPlayPause,
-                                icon: Icon(
-                                  isGlobalPlaying ? Icons.pause : Icons.play_arrow,
-                                  color: AppTheme.darkFontColor,
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                  ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Utils.sendAnalyticsEvent(AnalyticsEvents.chatBotTap);
+                      final chatbotState = ref.read(chatbotProvider);
+                      chatbotState.chatHistory.clear();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatScreen(
+                            audioId: audioModel.id,
+                            transcript: audioModel.responseModel?.paragraphs.transcript ?? '',
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      backgroundColor: AppTheme.primaryColor,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    icon: const HugeIcon(
+                      icon: HugeIcons.strokeRoundedAiChat02,
+                      color: AppTheme.darkFontColor,
+                    ),
+                    label: const Text(
+                      'Ask Question',
+                      style: TextStyle(color: AppTheme.darkFontColor),
+                    ),
+                  ),
+                ),
               ],
-            ).paddingSymmetric(horizontal: 12),
-            homeWatch.isSummaryGenerating
-                ? Positioned.fill(
-                    child: Container(
-                      decoration: BoxDecoration(color: Colors.black.withAlpha(160)),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
-                            strokeWidth: 6.0,
+            ).paddingSymmetric(horizontal: context.width * 0.08),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                audioModel.responseModel?.paragraphs.paragraphs?.isNotEmpty ?? false
+                    ? Tooltip(
+                        message: 'Toggle Transcription',
+                        child: IconButton(
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          icon: Icon(
+                            showFullTranscription
+                                ? LucideIcons.fileText400
+                                : HugeIcons.strokeRoundedLeftToRightListDash,
+                            color: AppTheme.lightFontColor,
                           ),
-                          const SizedBox(height: 20),
-                          Text(
-                            'Generating Summary...',
-                            style: TextStyle(
-                              fontSize: 19.sp,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.primaryColor,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            'Please wait while we generate the summary for you.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
-                            ),
-                          ).paddingSymmetric(horizontal: 40),
-                        ],
-                      ),
+                          onPressed: () {
+                            Utils.sendAnalyticsEvent(AnalyticsEvents.toggleTranscription);
+                            setState(
+                              () {
+                                showFullTranscription = !showFullTranscription;
+                              },
+                            );
+                            //show Full transcription
+                          },
+                        ),
+                      )
+                    : const SizedBox(),
+                Tooltip(
+                  message: 'Copy',
+                  child: IconButton(
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    icon: const HugeIcon(
+                      icon: HugeIcons.strokeRoundedCopy01,
+                      color: AppTheme.lightFontColor,
                     ),
-                  )
-                : const Offstage(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void showDeleteConfirmationDialog(BuildContext context, AudioModel model) {
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          backgroundColor: AppTheme.scaffoldBackgroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-            side: BorderSide(
-              color: AppTheme.lightFontColor.withAlpha(30),
-            ),
-          ),
-          elevation: 10,
-          title: const Text(
-            'Confirm Deletion',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: AppTheme.lightFontColor,
-            ),
-          ),
-          content: const Text(
-            'Are you sure you want to delete this transcription? This action cannot be undone.',
-            style: TextStyle(color: AppTheme.lightFontColor),
-          ),
-          actions: [
-            TextButton(
-              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
-              onPressed: () {
-                Navigator.pop(dialogContext);
-              },
-            ),
-            Consumer(builder: (context, ref, child) {
-              return ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    onPressed: () {
+                      Utils.sendAnalyticsEvent(AnalyticsEvents.copyFull);
+                      Clipboard.setData(ClipboardData(
+                        text: audioModel.responseModel?.paragraphs.transcript ?? Strings.strNoResultFound,
+                      ));
+                      showToast('Copied', AppTheme.darkFontColor);
+                    },
+                  ),
                 ),
-                onPressed: () async {
-                  Utils.sendAnalyticsEvent(AnalyticsEvents.deleteTranscription);
-                  ref.read(audioListProvider.notifier).deleteAudio(audioModel.id);
-                  Navigator.pop(dialogContext);
-                  Navigator.pop(context);
-                },
-                child: const Text('Delete', style: TextStyle(color: Colors.white)),
-              );
-            }),
+                Tooltip(
+                  message: 'Share',
+                  triggerMode: TooltipTriggerMode.longPress,
+                  child: IconButton(
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    icon: const HugeIcon(
+                      icon: HugeIcons.strokeRoundedShare01,
+                      color: AppTheme.lightFontColor,
+                    ),
+                    onPressed: () {
+                      Utils.sendAnalyticsEvent(AnalyticsEvents.shareFull);
+                      Share.share(
+                        '${audioModel.responseModel?.paragraphs.transcript ?? Strings.strNoResultFound} } Appstore: $strAppstoreLink',
+                      );
+                    },
+                  ),
+                ),
+                const Spacer(),
+                FutureBuilder<String>(
+                  future: Utils.getFilepath(audioModel.filePath),
+                  builder: (context, snapshot) {
+                    return Visibility(
+                      visible: snapshot.data != '' && snapshot.data != null,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 12.0),
+                        child: CircleAvatar(
+                          backgroundColor: AppTheme.primaryColor,
+                          radius: Sizes.radius,
+                          child: IconButton(
+                            onPressed: toggleGlobalPlayPause,
+                            icon: Icon(
+                              isGlobalPlaying ? Icons.pause : Icons.play_arrow,
+                              color: AppTheme.darkFontColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
           ],
-        );
-      },
+        ).paddingSymmetric(horizontal: 12),
+        homeWatch.isSummaryGenerating
+            ? Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(color: Colors.black.withAlpha(160)),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
+                        strokeWidth: 6.0,
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Generating Summary...',
+                        style: TextStyle(
+                          fontSize: 19.sp,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primaryColor,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Please wait while we generate the summary for you.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ).paddingSymmetric(horizontal: 40),
+                    ],
+                  ),
+                ),
+              )
+            : const Offstage(),
+        audioModel.id == -1
+            ? Positioned.fill(
+                child: Container(
+                  decoration: const BoxDecoration(color: Colors.black),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
+                        strokeWidth: 6.0,
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Loading Transcription',
+                        style: TextStyle(
+                          fontSize: 19.sp,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primaryColor,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                ),
+              )
+            : const Offstage(),
+      ],
     );
   }
 }

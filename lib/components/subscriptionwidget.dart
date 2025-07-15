@@ -9,7 +9,6 @@ Future<Widget> subscriptionCard(BuildContext context) async {
       ? ClickableCard(
           bgColor: AppTheme.primaryColor,
           onTap: () {
-            currentSource = Source.card;
             StoreConfig.showSubscription(context);
           },
           child: Padding(
@@ -18,16 +17,16 @@ Future<Widget> subscriptionCard(BuildContext context) async {
               title: Text(
                 Strings.strUpgrade,
                 style: TextStyle(
-                    fontSize: Sizes.mediumFont,
-                    fontWeight: FontWeight.w900,
-                    color: AppTheme.darkFontColor),
+                  fontSize: Sizes.mediumFont,
+                  fontWeight: FontWeight.w900,
+                  color: AppTheme.darkFontColor,
+                ),
               ),
               // subtitle: Text(Strings.strEnjoyAccess,
               //     style: TextStyle(
               //         fontWeight: FontWeight.w600,
               //         color: AppTheme.darkFontColor)),
-              leading: Lottie.asset(AssetsPath.giftjson,
-                  fit: BoxFit.fill, height: 30),
+              leading: Lottie.asset(AssetsPath.giftjson, fit: BoxFit.fill, height: 30),
               // ImageIcon(
               //   AssetImage(AssetsPath.subscription),
               //   size: 40,

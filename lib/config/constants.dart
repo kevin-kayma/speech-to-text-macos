@@ -4,8 +4,7 @@ import 'package:transcribe/config/config.dart';
 const String strAppName = 'Transcribe';
 String strFeedbackEmail = "fireboltonline@gmail.com";
 const String strPlaystoreLink = 'Coming soon';
-const String strAppstoreLink =
-    'https://apps.apple.com/us/app/transcriber-speech-to-text/id6739805580';
+const String strAppstoreLink = 'https://apps.apple.com/us/app/transcriber-speech-to-text/id6739805580';
 String strFeedbackURL =
     'https://docs.google.com/forms/d/e/1FAIpQLSd8Tv76gZ17MoSfsPQ3n-XAfmAvnyYHA_t-wT3PdPFNpnH27w/viewform';
 String strAppStoreID = '6739805580';
@@ -13,8 +12,7 @@ String strPlayStoreID = '';
 const String fontFamily = 'Karla';
 
 //Slack
-final slack = SlackNotifier(
-    'https://hooks.slack.com/services/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');
+final slack = SlackNotifier('https://hooks.slack.com/services/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');
 const String channelName = 'api-error';
 
 //RevenueCat Setup
@@ -31,10 +29,8 @@ const String strProductMonthly = 'P1M';
 const String strProductYearly = 'P1Y';
 
 //URLs
-const String strTermsAndCondition =
-    'https://sites.google.com/view/transcriberspeechtotext/terms-of-use';
-const String strPrivacyPolicy =
-    'https://sites.google.com/view/transcriberspeechtotext/privacy-policy';
+const String strTermsAndCondition = 'https://sites.google.com/view/transcriberspeechtotext/terms-of-use';
+const String strPrivacyPolicy = 'https://sites.google.com/view/transcriberspeechtotext/privacy-policy';
 
 //ChatGPT
 // String apiKey = '';
@@ -46,17 +42,14 @@ const String strPrivacyPolicy =
 String deepLinkKey = dotenv.env[EnvKeys.deepLinkKey] ?? '';
 
 //Initiate API
-String strInitiOSURL =
-    'https://firebasestorage.googleapis.com/v0/b/json-23e66.appspot.com/o/transcribe.json?alt=media';
+String strInitiOSURL = 'https://firebasestorage.googleapis.com/v0/b/json-23e66.appspot.com/o/transcribe.json?alt=media';
 
 String strInitAndroidURL =
     'https://firebasestorage.googleapis.com/v0/b/json-23e66.appspot.com/o/transcribe.json?alt=media';
 
 //Swagger API URLs
-const String urlSwTranscriptions =
-    "https://api.firebolt.co.in/api/Home/Transcriptions";
-const String urlSwGetToken =
-    "https://api.firebolt.co.in/api/Authentication/GetTokenValue";
+const String urlSwTranscriptions = "https://api.firebolt.co.in/api/Home/Transcriptions";
+const String urlSwGetToken = "https://api.firebolt.co.in/api/Authentication/GetTokenValue";
 
 //Network URLs
 String urlTranscriptions = "https://api.openai.com/v1/audio/transcriptions";
@@ -97,8 +90,22 @@ const int intMaxReviewsChat = 33;
 
 const int intMaxTokens = 10;
 
+int maxChatCount = 0;
+int maxSummaryCount = 0;
+
 //Google Ads
 const int maxFailedLoadAttempts = 3;
+//ChatGPT
+String apiKey = '';
+String backupAPIKey = '';
+String serverAPIKey = "";
+const String chatGPTModel = "gpt-4o-mini";
+const String chatGPTImageModel = "gpt-4o";
+
+const String urlSwVision = "https://api.firebolt.co.in/api/Home/Vision";
+
+int maxFailedAttemptServer = 3;
+int failedAttemptServer = 0;
 
 //Sizes
 class Sizes {

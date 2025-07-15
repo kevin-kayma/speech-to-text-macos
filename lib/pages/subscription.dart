@@ -1,20 +1,21 @@
 import 'dart:io';
 
-import 'package:bmprogresshud/bmprogresshud.dart';
 import 'package:flutter/services.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:transcribe/components/clickablecard.dart';
 import 'package:transcribe/components/error.dart';
 import 'package:transcribe/components/spacer.dart';
 import 'package:transcribe/config/config.dart';
-import 'package:transcribe/pages/home.dart';
 import 'package:transcribe/pages/tabbar.dart';
 
 class Subscription extends StatefulWidget {
   final Offering offering;
   final bool? isFromIntro;
-  const Subscription(
-      {super.key, required this.offering, this.isFromIntro = false});
+  const Subscription({
+    super.key,
+    required this.offering,
+    this.isFromIntro = false,
+  });
 
   @override
   State<Subscription> createState() => _SubscriptionState();
@@ -29,7 +30,7 @@ class _SubscriptionState extends State<Subscription> {
     // if (listPlans.isNotEmpty) {
     //   intSelectedIndex = listPlans.length - 1;
     // }
-    Utils.sendAnalyticsEvent(Keys.proSourceView);
+    Utils.sendAnalyticsEvent(AnalyticsEvents.proSourceView);
     super.initState();
   }
 
@@ -67,15 +68,14 @@ class _SubscriptionState extends State<Subscription> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    const Tabbar(),
+                                builder: (BuildContext context) => const Tabbar(),
                               ),
                             );
                           } else {
                             Navigator.pop(context);
                           }
                         },
-                        child: Text(
+                        child: const Text(
                           Strings.strSkip,
                           style: TextStyle(color: AppTheme.greyFontColor),
                         ),
@@ -93,10 +93,11 @@ class _SubscriptionState extends State<Subscription> {
                       visualDensity: const VisualDensity(vertical: -3),
                       title: Text(Strings.listFeatures[index],
                           style: TextStyle(
-                              color: AppTheme.lightFontColor,
-                              fontSize: Sizes.mediumFont,
-                              fontWeight: FontWeight.w700)),
-                      trailing: const Icon(Icons.done),
+                              color: AppTheme.lightFontColor, fontSize: Sizes.mediumFont, fontWeight: FontWeight.w700)),
+                      trailing: const Icon(
+                        Icons.done,
+                        color: AppTheme.primaryColor,
+                      ),
                     );
                   },
                 ),
@@ -113,9 +114,7 @@ class _SubscriptionState extends State<Subscription> {
                     return Stack(
                       children: [
                         ClickableCard(
-                          bgColor: isHighlighted
-                              ? AppTheme.primaryColor.withAlpha(60)
-                              : null,
+                          bgColor: isHighlighted ? AppTheme.primaryColor.withAlpha(60) : null,
                           onTap: () async {
                             setState(() {
                               intSelectedIndex = index;
@@ -126,12 +125,10 @@ class _SubscriptionState extends State<Subscription> {
                               border: Border.all(
                                 color: isHighlighted
                                     ? AppTheme.primaryColor
-                                    : Colors
-                                        .transparent, // Customize border color
+                                    : Colors.transparent, // Customize border color
                                 width: 1.0, // Border width
                               ),
-                              borderRadius: BorderRadius.circular(
-                                  15.0), // Optional: Add rounded corners
+                              borderRadius: BorderRadius.circular(15.0), // Optional: Add rounded corners
                             ),
                             child: Center(
                               child: ListTile(
@@ -142,10 +139,7 @@ class _SubscriptionState extends State<Subscription> {
                                       fontSize: Sizes.mediumFont,
                                       fontWeight: FontWeight.w700),
                                 ),
-                                subtitle: (listPlans[index]
-                                            .storeProduct
-                                            .subscriptionPeriod ==
-                                        strProductWeekly)
+                                subtitle: (listPlans[index].storeProduct.subscriptionPeriod == strProductWeekly)
                                     ? null
                                     : Text(
                                         "${listPlans[index].storeProduct.priceString} / $timePeriod",
@@ -159,10 +153,7 @@ class _SubscriptionState extends State<Subscription> {
                                   style: TextStyle(
                                       fontSize: Sizes.mediumFont,
                                       color: AppTheme.lightFontColor,
-                                      fontWeight: (listPlans[index]
-                                                  .storeProduct
-                                                  .subscriptionPeriod ==
-                                              strProductWeekly)
+                                      fontWeight: (listPlans[index].storeProduct.subscriptionPeriod == strProductWeekly)
                                           ? FontWeight.w700
                                           : FontWeight.w500),
                                 ),
@@ -187,50 +178,36 @@ class _SubscriptionState extends State<Subscription> {
                     width: MediaQuery.of(context).size.width,
                     height: Sizes.largeHeight,
                     child: ElevatedButton(
-                      style: ButtonStyle(
-                          backgroundColor:
-                              WidgetStatePropertyAll(AppTheme.primaryColor)),
+                      style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll(AppTheme.primaryColor)),
                       onPressed: () async {
-                        Utils.sendAnalyticsEvent(Keys.strAnlPurchasePlan);
-                        currentID = listPlans[intSelectedIndex]
-                            .identifier
-                            .replaceAll('\$rc_', '');
+                        currentID = getDuration(listPlans[intSelectedIndex]);
 
-                        Utils.sendAnalyticsEvent(Keys.proSIdTap);
+                        Utils.sendAnalyticsEvent(AnalyticsEvents.proSIdTap);
                         ProgressHud.showLoading();
                         try {
-                          CustomerInfo customerInfo =
-                              await Purchases.purchasePackage(
-                                  listPlans[intSelectedIndex]);
-                          if (customerInfo.entitlements.all[entitlementID] !=
-                                  null &&
-                              customerInfo.entitlements.all[entitlementID]
-                                      ?.isActive ==
-                                  true) {
-                            showToast(Strings.strEnjoySubscription,
-                                AppTheme.primaryColor);
+                          CustomerInfo customerInfo = await Purchases.purchasePackage(listPlans[intSelectedIndex]);
+                          if (customerInfo.entitlements.all[entitlementID] != null &&
+                              customerInfo.entitlements.all[entitlementID]?.isActive == true) {
+                            showToast(Strings.strEnjoySubscription, AppTheme.primaryColor);
 
                             isUserSubscribed = true;
                             ProgressHud.dismiss();
-                            Utils.sendAnalyticsEvent(Keys.proSIdSuccess);
+                            Utils.sendAnalyticsEvent(AnalyticsEvents.proSIdSuccess);
 
                             // ignore: use_build_context_synchronously
-                            Navigator.of(context).pushNamedAndRemoveUntil(
-                                AppRoutes.tabbar,
-                                (Route<dynamic> route) => false);
+                            Navigator.of(context)
+                                .pushNamedAndRemoveUntil(AppRoutes.tabbar, (Route<dynamic> route) => false);
                           } else {
                             isUserSubscribed = false;
-                            Utils.sendAnalyticsEvent(Keys.proSIdFailure);
+                            Utils.sendAnalyticsEvent(AnalyticsEvents.proSIdFailure);
                           }
                         } on PlatformException catch (e) {
                           if (e.code != '1') {
-                            Utils.sendErrorToSlack(
-                                'Subscription Error ${e.message}',
-                                statusCode: e.code);
+                            Utils.sendErrorToSlack('Subscription Error ${e.message}', statusCode: e.code);
                             debugPrint(e.toString());
                             showToast(Strings.strSomethingWentWrong);
                           }
-                          Utils.sendAnalyticsEvent(Keys.proSIdFailure);
+                          Utils.sendAnalyticsEvent(AnalyticsEvents.proSIdFailure);
                         }
                         ProgressHud.dismiss();
                       },
@@ -239,9 +216,7 @@ class _SubscriptionState extends State<Subscription> {
                             ? Strings.strFreeTrial.toUpperCase()
                             : Strings.strSubscribe.toUpperCase(),
                         style: TextStyle(
-                            color: AppTheme.darkFontColor,
-                            fontSize: Sizes.mediumFont,
-                            fontWeight: FontWeight.bold),
+                            color: AppTheme.darkFontColor, fontSize: Sizes.mediumFont, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -249,17 +224,16 @@ class _SubscriptionState extends State<Subscription> {
                 Center(
                   child: TextButton(
                     onPressed: () async {
-                      await StoreConfig.manageUser(
-                          SubscriptionTask.restore, null);
+                      await StoreConfig.manageUser(SubscriptionTask.restore, null);
                       Utils.refreshSubscription();
 
                       if (isUserSubscribed) {
                         // ignore: use_build_context_synchronously
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                            AppRoutes.tabbar, (Route<dynamic> route) => false);
+                        Navigator.of(context)
+                            .pushNamedAndRemoveUntil(AppRoutes.tabbar, (Route<dynamic> route) => false);
                       }
                     },
-                    child: Text(
+                    child: const Text(
                       Strings.strRestorePurchase,
                       style: TextStyle(color: AppTheme.primaryColor),
                     ),
@@ -272,7 +246,7 @@ class _SubscriptionState extends State<Subscription> {
                       onPressed: () {
                         Utils.launchWebViewInApp(strTermsAndCondition);
                       },
-                      child: Text(
+                      child: const Text(
                         Strings.strTermsOfUse,
                         style: TextStyle(color: AppTheme.primaryColor),
                       ),
@@ -282,7 +256,7 @@ class _SubscriptionState extends State<Subscription> {
                         onPressed: () {
                           Utils.launchWebViewInApp(strPrivacyPolicy);
                         },
-                        child: Text(
+                        child: const Text(
                           Strings.strPrivacyPolicy,
                           style: TextStyle(
                             color: AppTheme.primaryColor,
@@ -296,11 +270,9 @@ class _SubscriptionState extends State<Subscription> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
                   child: Text(
-                    (Platform.isIOS)
-                        ? Strings.strSubscriptionFooteriOS
-                        : Strings.strSubscriptionFooterAndroid,
+                    (Platform.isIOS) ? Strings.strSubscriptionFooteriOS : Strings.strSubscriptionFooterAndroid,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: AppTheme.greyFontColor),
+                    style: const TextStyle(color: AppTheme.greyFontColor),
                   ),
                 ),
               ],
@@ -313,7 +285,7 @@ class _SubscriptionState extends State<Subscription> {
 
   Widget buildTag() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: AppTheme.primaryColor, // The tag color
         borderRadius: BorderRadius.circular(20),
@@ -334,8 +306,7 @@ class _SubscriptionState extends State<Subscription> {
     double price = package.storeProduct.price;
 
     // Extracting the currency symbol (string)
-    String currencySymbol =
-        package.storeProduct.priceString.replaceAll(RegExp(r'[0-9.,]'), '');
+    String currencySymbol = package.storeProduct.priceString.replaceAll(RegExp(r'[0-9.,]'), '');
 
     switch (strSubscriptionKey) {
       case strProductWeekly:
@@ -344,14 +315,12 @@ class _SubscriptionState extends State<Subscription> {
       // return Strings.strWeeklySubtitle;
       case strProductMonthly:
         double monthlyPricePerWeek = price / 4.0; // Assuming 4 weeks in a month
-        String subtitle =
-            '$currencySymbol${monthlyPricePerWeek.toStringAsFixed(2)} / week';
+        String subtitle = '$currencySymbol${monthlyPricePerWeek.toStringAsFixed(2)} / week';
         return subtitle;
       // return Strings.strMonthlySubtitle;
       case strProductYearly:
         double yearlyPricePerWeek = price / 52.0; // Assuming 52 weeks in a year
-        String subtitle =
-            '$currencySymbol${yearlyPricePerWeek.toStringAsFixed(2)} / week';
+        String subtitle = '$currencySymbol${yearlyPricePerWeek.toStringAsFixed(2)} / week';
         return subtitle;
       // return Strings.strYearlySubtitle;
       default:
@@ -360,8 +329,8 @@ class _SubscriptionState extends State<Subscription> {
   }
 
   bool hasTrial(Package package) {
-    final freeOffer = package.storeProduct.introductoryPrice != null &&
-        package.storeProduct.introductoryPrice?.price == 0.0;
+    final freeOffer =
+        package.storeProduct.introductoryPrice != null && package.storeProduct.introductoryPrice?.price == 0.0;
     return freeOffer;
   }
 
@@ -402,32 +371,40 @@ class _SubscriptionState extends State<Subscription> {
       case strProductWeekly:
         if (hasTrial(package)) {
           String strPeriod = getUnit(package);
-          String days = package
-                  .storeProduct.introductoryPrice?.periodNumberOfUnits
-                  .toString() ??
-              '';
+          String days = package.storeProduct.introductoryPrice?.periodNumberOfUnits.toString() ?? '';
           strWeekly = '$strWeekly ($days $strPeriod ${Strings.strFreeTrial})';
         }
         return strWeekly;
       case strProductMonthly:
         if (hasTrial(package)) {
           String strPeriod = getUnit(package);
-          String days = package
-                  .storeProduct.introductoryPrice?.periodNumberOfUnits
-                  .toString() ??
-              '';
+          String days = package.storeProduct.introductoryPrice?.periodNumberOfUnits.toString() ?? '';
           strMonthly = '$strMonthly ($days $strPeriod ${Strings.strFreeTrial})';
         }
         return strMonthly;
       case strProductYearly:
         if (hasTrial(package)) {
           String strPeriod = getUnit(package);
-          String days = package
-                  .storeProduct.introductoryPrice?.periodNumberOfUnits
-                  .toString() ??
-              '';
+          String days = package.storeProduct.introductoryPrice?.periodNumberOfUnits.toString() ?? '';
           strYearly = '$strYearly ($days $strPeriod ${Strings.strFreeTrial})';
         }
+        return strYearly;
+      default:
+        return '';
+    }
+  }
+
+  String getDuration(Package package) {
+    String strWeekly = Strings.strWeekly;
+    String strMonthly = Strings.strMonthly;
+    String strYearly = Strings.strYearly;
+
+    switch (package.storeProduct.subscriptionPeriod) {
+      case strProductWeekly:
+        return strWeekly;
+      case strProductMonthly:
+        return strMonthly;
+      case strProductYearly:
         return strYearly;
       default:
         return '';

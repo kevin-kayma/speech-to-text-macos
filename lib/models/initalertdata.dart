@@ -17,6 +17,8 @@ class InitAlertData {
   String? intMaxAudio;
   String? intMaxRecordAudio;
   String? entitlementID;
+  String? intMaxChat;
+  String? intMaxSummary;
 
   InitAlertData({
     this.title,
@@ -37,6 +39,8 @@ class InitAlertData {
     this.intMaxAudio,
     this.intMaxRecordAudio,
     this.entitlementID,
+    this.intMaxChat,
+    this.intMaxSummary,
   });
 
   InitAlertData.fromJson(Map<String, dynamic> json) {
@@ -58,6 +62,8 @@ class InitAlertData {
     intMaxAudio = json['intMaxAudio'];
     intMaxRecordAudio = json['intMaxRecordAudio'];
     entitlementID = json['entitlementID'];
+    intMaxChat = json['intMaxChat'];
+    intMaxSummary = json['intMaxSummary'];
   }
 
   Map<String, dynamic> toJson() {
@@ -80,6 +86,8 @@ class InitAlertData {
     data['intMaxAudio'] = intMaxAudio;
     data['intMaxRecordAudio'] = intMaxRecordAudio;
     data['entitlementID'] = entitlementID;
+    data['intMaxChat'] = intMaxChat;
+    data['intMaxSummary'] = intMaxSummary;
     return data;
   }
 }

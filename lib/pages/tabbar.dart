@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:transcribe/components/components.dart';
+import 'package:transcribe/controllers/home_controller.dart';
+import 'package:transcribe/extension/padding_extension.dart';
 import 'package:transcribe/pages/pages.dart';
 import 'package:transcribe/config/config.dart';
+import 'package:transcribe/providers/audio_provider.dart';
 
-class Tabbar extends StatefulWidget {
+class Tabbar extends ConsumerStatefulWidget {
   const Tabbar({
     Key? key,
-    this.index = 0, // Optional field with default value
+    this.index = 0,
   }) : super(key: key);
 
   final int index;
 
   @override
-  TabbarState createState() => TabbarState();
+  ConsumerState<Tabbar> createState() => TabbarState();
 }
 
-class TabbarState extends State<Tabbar> {
+class TabbarState extends ConsumerState<Tabbar> {
   late int currentIndex;
 
   @override
@@ -71,6 +74,7 @@ class TabbarState extends State<Tabbar> {
 
   @override
   Widget build(BuildContext context) {
+    final homeWatch = ref.watch(homeController);
     return LayoutBuilder(
       builder: (context, constraints) {
         return MacosWindow(
@@ -89,26 +93,103 @@ class TabbarState extends State<Tabbar> {
                         child: Column(
                           children: [
                             Padding(
-                              padding:
-                                  EdgeInsets.all(!isUserSubscribed ? 12.0 : 0),
+                              padding: EdgeInsets.all(!isUserSubscribed ? 12.0 : 0),
                               child: FutureBuilder(
                                 future: subscriptionCard(context),
-                                builder: (ctx, snapshot) =>
-                                    snapshot.data ?? const SizedBox(),
+                                builder: (ctx, snapshot) => snapshot.data ?? const SizedBox(),
                               ),
                             ),
                             !isUserSubscribed
-                                ? Divider(
+                                ? const Divider(
                                     color: AppTheme.greyFontColor,
                                   )
                                 : const SizedBox(),
-                            buildSidebarTile(
-                              icon: HugeIcons.strokeRoundedVoice,
-                              title: strAppName,
-                              onTap: () => setState(() => currentIndex = 0),
-                              selected: currentIndex == 0,
-                            ),
-                            Divider(
+                            // buildSidebarTile(
+                            //   icon: HugeIcons.strokeRoundedVoice,
+                            //   title: strAppName,
+                            //   onTap: () => setState(() => currentIndex = 0),
+                            //   selected: currentIndex == 0,
+                            // ),
+                            GestureDetector(
+                              onTap: () {
+                                homeWatch.updateSelectedTile(Tile.record);
+                              },
+                              child: Container(
+                                height: 54,
+                                decoration: BoxDecoration(
+                                  color: homeWatch.selectedTile == Tile.record
+                                      ? Colors.white.withAlpha(15)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      HugeIcons.strokeRoundedMic01,
+                                      color: homeWatch.selectedTile == Tile.record
+                                          ? AppTheme.primaryColor
+                                          : Colors.white.withAlpha(200),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      'Transcribe',
+                                      style: TextStyle(
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: homeWatch.selectedTile == Tile.record
+                                            ? AppTheme.primaryColor
+                                            : Colors.white.withAlpha(200),
+                                      ),
+                                    )
+                                  ],
+                                ).paddingSymmetric(horizontal: 10),
+                              ),
+                            ).paddingSymmetric(horizontal: 10),
+                            const SizedBox(width: 10),
+                            GestureDetector(
+                              onTap: () async {
+                                ref.read(audioListProvider.notifier).loadAudioHistory();
+                                homeWatch.updateSelectedTile(Tile.history);
+                              },
+                              child: Container(
+                                height: 54,
+                                decoration: BoxDecoration(
+                                  color: homeWatch.selectedTile == Tile.history
+                                      ? Colors.white.withAlpha(15)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      HugeIcons.strokeRoundedNote01,
+                                      color: homeWatch.selectedTile == Tile.history
+                                          ? AppTheme.primaryColor
+                                          : Colors.white.withAlpha(200),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      'History',
+                                      style: TextStyle(
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: homeWatch.selectedTile == Tile.history
+                                            ? AppTheme.primaryColor
+                                            : Colors.white.withAlpha(200),
+                                      ),
+                                    )
+                                  ],
+                                ).paddingSymmetric(horizontal: 10),
+                              ),
+                            ).paddingSymmetric(horizontal: 10),
+
+                            const Divider(
                               color: AppTheme.greyFontColor,
                             ),
                             buildNetworkDependentTile(
@@ -116,8 +197,7 @@ class TabbarState extends State<Tabbar> {
                               icon: HugeIcons.strokeRoundedMagicWand02,
                               title: Strings.strRateApp,
                               onAction: () async {
-                                Utils.sendAnalyticsEvent(
-                                    Keys.strAnlSettingRateApp);
+                                Utils.sendAnalyticsEvent(AnalyticsEvents.settingRateApp);
                                 bool isConnection = await Utils.checkInternet();
                                 if (isConnection) {
                                   Utils.openStoreReview();
@@ -134,16 +214,11 @@ class TabbarState extends State<Tabbar> {
                               icon: HugeIcons.strokeRoundedShare05,
                               title: Strings.strShareApp,
                               onAction: () async {
-                                Utils.sendAnalyticsEvent(
-                                    Keys.strAnlSettingShareApp);
+                                Utils.sendAnalyticsEvent(AnalyticsEvents.settingShareApp);
                                 try {
                                   Share.share(Strings.strShareText,
-                                      sharePositionOrigin: Rect.fromLTWH(
-                                          0,
-                                          0,
-                                          MediaQuery.of(context).size.width,
-                                          MediaQuery.of(context).size.height /
-                                              2));
+                                      sharePositionOrigin: Rect.fromLTWH(0, 0, MediaQuery.of(context).size.width,
+                                          MediaQuery.of(context).size.height / 2));
                                 } catch (e) {
                                   debugPrint(e.toString());
                                 }
@@ -154,12 +229,10 @@ class TabbarState extends State<Tabbar> {
                               icon: HugeIcons.strokeRoundedDocumentValidation,
                               title: Strings.strTermsOfUse,
                               onAction: () async {
-                                Utils.sendAnalyticsEvent(
-                                    Keys.strAnlSettingTerms);
+                                Utils.sendAnalyticsEvent(AnalyticsEvents.settingTerms);
                                 bool isConnection = await Utils.checkInternet();
                                 if (isConnection) {
-                                  Utils.launchWebViewInApp(
-                                      strTermsAndCondition);
+                                  Utils.launchWebViewInApp(strTermsAndCondition);
                                 } else {
                                   // ignore: use_build_context_synchronously
                                   Utils.noNetworkDialog(
@@ -176,8 +249,7 @@ class TabbarState extends State<Tabbar> {
                               icon: HugeIcons.strokeRoundedSecurityCheck,
                               title: Strings.strPrivacyPolicy,
                               onAction: () async {
-                                Utils.sendAnalyticsEvent(
-                                    Keys.strAnlSettingPrivacy);
+                                Utils.sendAnalyticsEvent(AnalyticsEvents.settingPrivacy);
                                 bool isConnection = await Utils.checkInternet();
                                 if (isConnection) {
                                   Utils.launchWebViewInApp(strPrivacyPolicy);
@@ -198,20 +270,16 @@ class TabbarState extends State<Tabbar> {
                     ),
                     GestureDetector(
                       onTap: () async {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const FeedbackView()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const FeedbackView()));
                       },
                       child: Container(
                         height: 50,
-                        decoration: BoxDecoration(
-                            color: AppTheme.primaryColor.withAlpha(100)),
+                        decoration: BoxDecoration(color: AppTheme.primaryColor.withAlpha(100)),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            HugeIcon(
+                            const HugeIcon(
                               icon: HugeIcons.strokeRoundedComment01,
                               size: 20,
                               color: AppTheme.lightFontColor,
@@ -236,7 +304,7 @@ class TabbarState extends State<Tabbar> {
           ),
           child: IndexedStack(
             index: currentIndex,
-            children: [
+            children: const [
               MyHomePage(),
             ],
           ),

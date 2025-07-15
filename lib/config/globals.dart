@@ -6,7 +6,7 @@ bool isIntroLoaded = false;
 bool inReview = false;
 
 //Temp
-int audioID = 0;
+int tempAudioId = 0;
 
 //AlertData
 InitAlertData initAlertData = InitAlertData();

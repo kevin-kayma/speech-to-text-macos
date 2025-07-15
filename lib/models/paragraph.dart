@@ -27,9 +27,7 @@ class Paragraph extends HiveObject {
   // Factory constructor to create a Paragraph from JSON
   factory Paragraph.fromJson(Map<String, dynamic> json) {
     return Paragraph(
-      sentences: (json['sentences'] as List)
-          .map((sentenceJson) => Sentence.fromJson(sentenceJson))
-          .toList(),
+      sentences: (json['sentences'] as List).map((sentenceJson) => Sentence.fromJson(sentenceJson)).toList(),
       numWords: json['num_words'],
       start: json['start'].toDouble(),
       end: json['end'].toDouble(),
@@ -44,5 +42,28 @@ class Paragraph extends HiveObject {
       'start': start,
       'end': end,
     };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is Paragraph &&
+        other.numWords == numWords &&
+        other.start == start &&
+        other.end == end &&
+        _listEquals(other.sentences, sentences);
+  }
+
+  @override
+  int get hashCode => sentences.hashCode ^ numWords.hashCode ^ start.hashCode ^ end.hashCode;
+
+  /// Helper to compare lists deeply
+  bool _listEquals(List<Sentence> a, List<Sentence> b) {
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
   }
 }
